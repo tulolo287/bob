@@ -8,7 +8,7 @@ public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setForegroundFPS(60);
-		//config.setWindowSizeLimits(234, 233, 666, 666);
+		config.setWindowSizeLimits(480, 320, 480, 320);
 		new Lwjgl3Application(new Start(), config);
 	}
 }
