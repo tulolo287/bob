@@ -14,7 +14,7 @@ public class AndroidLauncher extends AndroidApplication {
 		config.useCompass = false;
 		//config.useWakelock = true;
 =======
->>>>>>> a0e9a47 (init bob)
+>>>>>>> 518773d (init bob)
 		initialize(new Start(), config);
 	}
 }
