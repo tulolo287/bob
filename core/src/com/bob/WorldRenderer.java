@@ -1,9 +1,13 @@
 package com.bob;
 
+<<<<<<< HEAD
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+=======
+import com.badlogic.gdx.graphics.OrthographicCamera;
+>>>>>>> 518773d (init bob)
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -11,6 +15,7 @@ public class WorldRenderer {
     private World world;
     private OrthographicCamera cam;
 
+<<<<<<< HEAD
     private static float CAMERA_WIDTH = 10f;
     private static float CAMERA_HEIGHT = 8f;
 
@@ -70,6 +75,18 @@ public class WorldRenderer {
     }
 
     private void drawDebug() {
+=======
+    ShapeRenderer debugRenderer = new ShapeRenderer();
+
+    public WorldRenderer(World world) {
+        this.world = world;
+        this.cam = new OrthographicCamera(10, 7);
+        this.cam.position.set(5, 3.5f, 0);
+        this.cam.update();
+    }
+
+    public void render() {
+>>>>>>> 518773d (init bob)
         debugRenderer.setProjectionMatrix(cam.combined);
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
         for (Block block : world.getBlocks()) {
@@ -88,7 +105,12 @@ public class WorldRenderer {
         debugRenderer.rect(x1, y1, rect.width, rect.height);
 
         debugRenderer.end();
+<<<<<<< HEAD
     }
 
 
+=======
+
+    }
+>>>>>>> 518773d (init bob)
 }
