@@ -21,12 +21,12 @@ public class World {
     }
 
     private void createWorld() {
-        bob = new Bob(new Vector2(2, 1));
+        bob = new Bob(new Vector2(7, 2));
 
         for (int i = 0; i < 20; i++) {
             blocks.add(new Block(new Vector2(i, 0)));
             blocks.add(new Block(new Vector2(i, 7)));
-            //if (i > 2) blocks.add(new Block(new Vector2(i, 1)));
+            if (i > 2) blocks.add(new Block(new Vector2(i, 1)));
         }
         blocks.add(new Block(new Vector2(9, 1)));
         blocks.add(new Block(new Vector2(11, 3)));
