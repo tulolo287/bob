@@ -10,7 +10,11 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         world = new World();
+<<<<<<< HEAD
+        renderer = new WorldRenderer(world, false);
+=======
         renderer = new WorldRenderer(world);
+>>>>>>> 518773d (init bob)
     }
 
     @Override
@@ -22,7 +26,11 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+<<<<<<< HEAD
+        renderer.setSize(width, height);
+=======
 
+>>>>>>> 518773d (init bob)
     }
 
     @Override
