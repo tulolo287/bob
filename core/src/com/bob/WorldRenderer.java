@@ -1,13 +1,12 @@
 package com.bob;
 
-<<<<<<< HEAD
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-=======
-import com.badlogic.gdx.graphics.OrthographicCamera;
->>>>>>> 518773d (init bob)
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -15,9 +14,8 @@ public class WorldRenderer {
     private World world;
     private OrthographicCamera cam;
 
-<<<<<<< HEAD
-    private static float CAMERA_WIDTH = 10f;
-    private static float CAMERA_HEIGHT = 8f;
+    private static float CAMERA_WIDTH = 8f;
+    private static float CAMERA_HEIGHT = 6f;
 
     ShapeRenderer debugRenderer = new ShapeRenderer();
 
@@ -30,6 +28,15 @@ public class WorldRenderer {
     private int height;
     private float ppuX;
     private float ppuY;
+
+    private static final float RUNNING_FRAME_DURATION = 0.06f;
+
+    private TextureRegion bobIdle;
+    //private TextureRegion blockTexture;
+
+
+    private Animation bobIdleAnimation;
+
 
     public void setSize(int w, int h) {
         this.width = w;
@@ -49,8 +56,18 @@ public class WorldRenderer {
     }
 
     private void loadTextures() {
-        bobTexture = new Texture(Gdx.files.internal("images/bob_01.png"));
-        blockTexture = new Texture(Gdx.files.internal("images/block.png"));
+        //bobTexture = new Texture(Gdx.files.internal("images/hobbit.png"));
+        //blockTexture = new Texture(Gdx.files.internal("images/ground2.png"));
+
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("images/textures3/textures.atlas"));
+        bobIdle = atlas.findRegion("Hobbit - Idle1");
+        System.out.println(bobIdle);
+        TextureRegion[] bobIdleFrames = new TextureRegion[4];
+        for (int i = 1; i < 4; i++) {
+            bobIdleFrames[i] = atlas.findRegion("Hobbit - Idle" + (i + 2));
+        }
+        bobIdleAnimation = new Animation(RUNNING_FRAME_DURATION, bobIdleFrames);
+
     }
 
     public void render() {
@@ -65,7 +82,10 @@ public class WorldRenderer {
 
     private void drawBob() {
         Bob bob = world.getBob();
-        spriteBatch.draw(bobTexture, bob.getPosition().x * ppuX, bob.getPosition().y * ppuY, Bob.SIZE * ppuX, Bob.SIZE * ppuY);
+
+        spriteBatch.draw(bobIdle, bob.getPosition().x * ppuX, bob.getPosition().y * ppuY, Bob.SIZE * ppuX, Bob.SIZE * ppuY);
+
+        //spriteBatch.draw(bobTexture, bob.getPosition().x * ppuX, bob.getPosition().y * ppuY, Bob.SIZE * ppuX, Bob.SIZE * ppuY);
     }
 
     private void drawBlocks() {
@@ -75,18 +95,6 @@ public class WorldRenderer {
     }
 
     private void drawDebug() {
-=======
-    ShapeRenderer debugRenderer = new ShapeRenderer();
-
-    public WorldRenderer(World world) {
-        this.world = world;
-        this.cam = new OrthographicCamera(10, 7);
-        this.cam.position.set(5, 3.5f, 0);
-        this.cam.update();
-    }
-
-    public void render() {
->>>>>>> 518773d (init bob)
         debugRenderer.setProjectionMatrix(cam.combined);
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
         for (Block block : world.getBlocks()) {
@@ -105,12 +113,7 @@ public class WorldRenderer {
         debugRenderer.rect(x1, y1, rect.width, rect.height);
 
         debugRenderer.end();
-<<<<<<< HEAD
     }
 
 
-=======
-
-    }
->>>>>>> 518773d (init bob)
 }
