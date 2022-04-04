@@ -7,9 +7,11 @@ public class Bob {
     public static enum State {
         IDLE, JUMP, WALK, DYE
     }
-    static final float SPEED = 2f;
+    static final float SPEED = 4f;
     static final float JUMP_VELOCITY = 1f;
     static final float SIZE = 0.5f;
+
+    public float stateTime = 0;
 
     Vector2 position = new Vector2();
     Vector2 acceleration = new Vector2();
@@ -22,6 +24,14 @@ public class Bob {
         this.position = position;
         this.bounds.height = SIZE;
         this.bounds.width = SIZE;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+    public void update(float dt) {
+        stateTime += dt;
+        position.add(velocity.scl(dt));
     }
 
     public static float getSPEED() {

@@ -1,0 +1,41 @@
+
+textures.png
+size: 512, 128
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+Hobbit - Idle1
+  rotate: false
+  xy: 2, 20
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+Hobbit - Idle2
+  rotate: false
+  xy: 68, 20
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+Hobbit - Idle3
+  rotate: false
+  xy: 134, 20
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+Hobbit - Idle4
+  rotate: false
+  xy: 200, 20
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+ground2
+  rotate: false
+  xy: 2, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
