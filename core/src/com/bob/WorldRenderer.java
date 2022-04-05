@@ -29,13 +29,16 @@ public class WorldRenderer {
     private float ppuX;
     private float ppuY;
 
-    private static final float RUNNING_FRAME_DURATION = 0.06f;
+    private static final float RUNNING_FRAME_DURATION = 0.2f;
 
     private TextureRegion bobIdle;
-    //private TextureRegion blockTexture;
+    private TextureRegion bobFrame;
 
 
-    private Animation bobIdleAnimation;
+    public Animation<TextureRegion> bobIdleRightAnimation;
+    public Animation<TextureRegion> bobIdleLeftAnimation;
+    public Animation<TextureRegion> bobWalkRightAnimation;
+    public Animation<TextureRegion> bobWalkLeftAnimation;
 
 
     public void setSize(int w, int h) {
@@ -56,17 +59,40 @@ public class WorldRenderer {
     }
 
     private void loadTextures() {
-        //bobTexture = new Texture(Gdx.files.internal("images/hobbit.png"));
-        //blockTexture = new Texture(Gdx.files.internal("images/ground2.png"));
+        bobTexture = new Texture(Gdx.files.internal("images/hobbit/Hobbit - Idle1.png"));
+        blockTexture = new Texture(Gdx.files.internal("images/hobbit/ground2.png"));
 
-        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("images/textures3/textures.atlas"));
-        bobIdle = atlas.findRegion("Hobbit - Idle1");
-        System.out.println(bobIdle);
-        TextureRegion[] bobIdleFrames = new TextureRegion[4];
-        for (int i = 1; i < 4; i++) {
-            bobIdleFrames[i] = atlas.findRegion("Hobbit - Idle" + (i + 2));
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("images/textures2/textures.atlas"));
+
+       // b///obIdleRight = atlas.findRegion("Hobbit - Idle1");
+
+        TextureRegion[] bobIdleRight = new TextureRegion[3];
+        for (int i = 0; i < 3; i++) {
+            bobIdleRight[i] = atlas.findRegion("Hobbit - Idle" + (i + 1));
         }
-        bobIdleAnimation = new Animation(RUNNING_FRAME_DURATION, bobIdleFrames);
+        bobIdleRightAnimation = new Animation(0.25f, bobIdleRight, null);
+
+
+        TextureRegion[] bobIdleLeft = new TextureRegion[3];
+        for (int i = 0; i < 3; i++) {
+            bobIdleLeft[i] = new TextureRegion(bobIdleRight[i]);
+            bobIdleLeft[i].flip(true, false);
+        }
+        bobIdleLeftAnimation = new Animation(0.25f, bobIdleLeft, null);
+
+        //bobRun = atlas.findRegion("Hobbit - run1");
+        TextureRegion[] bobWalkRight = new TextureRegion[8];
+        for (int i = 0; i < 8; i++) {
+            bobWalkRight[i] = atlas.findRegion("Hobbit - run" + (i + 1));
+        }
+        bobWalkRightAnimation = new Animation(0.1f, bobWalkRight, null);
+
+        TextureRegion[] bobWalkLeft = new TextureRegion[8];
+        for (int i = 0; i < 8; i++) {
+            bobWalkLeft[i] = new TextureRegion(bobWalkLeft[i]);
+            bobWalkLeft[i].flip(true, false);
+        }
+        bobWalkLeftAnimation = new Animation(0.1f, bobWalkLeft, null);
 
     }
 
@@ -81,11 +107,22 @@ public class WorldRenderer {
     }
 
     private void drawBob() {
+
         Bob bob = world.getBob();
+        //System.out.println(bob.isFacingLeft());
+        //bobFrame = bob.isFacingLeft() ? bobWalkLeft : bobWalkRight;
+        switch (bob.getState()) {
+            case IDLE:
+                bobFrame = bob.isFacingLeft() ? (TextureRegion) bobIdleLeftAnimation.getKeyFrame(bob.getStateTime(), true) : (TextureRegion) bobIdleRightAnimation.getKeyFrame(bob.getStateTime(), true);
+                break;
+            case WALK:
+                bobFrame = bob.isFacingLeft() ? (TextureRegion) bobWalkLeftAnimation.getKeyFrame(bob.getStateTime(), true) : (TextureRegion) bobWalkRightAnimation.getKeyFrame(bob.getStateTime(), true);
+                break;
+        }
 
-        spriteBatch.draw(bobIdle, bob.getPosition().x * ppuX, bob.getPosition().y * ppuY, Bob.SIZE * ppuX, Bob.SIZE * ppuY);
+        spriteBatch.draw(bobFrame, bob.getPosition().x * ppuX, bob.getPosition().y * ppuY, bob.bounds.getWidth() / 2 * ppuX, bob.bounds.getHeight() / 2 * ppuY, bob.bounds.width * ppuX, bob.bounds.height * ppuY, 5f,5f, 0);
 
-        //spriteBatch.draw(bobTexture, bob.getPosition().x * ppuX, bob.getPosition().y * ppuY, Bob.SIZE * ppuX, Bob.SIZE * ppuY);
+       // spriteBatch.draw(bobTexture, bob.getPosition().x * ppuX, bob.getPosition().y * ppuY, Bob.SIZE * ppuX, Bob.SIZE * ppuY);
     }
 
     private void drawBlocks() {
