@@ -23,7 +23,7 @@ public class WorldRenderer {
     private Texture bobTexture;
 
     private SpriteBatch spriteBatch;
-    private boolean debug = false;
+    private boolean debug = true;
     private int width;
     private int height;
     private float ppuX;
@@ -32,10 +32,11 @@ public class WorldRenderer {
     private static final float RUNNING_FRAME_DURATION = 0.06f;
 
     private TextureRegion bobIdle;
-    //private TextureRegion blockTexture;
+
 
 
     private Animation bobIdleAnimation;
+    private Animation bobRunAnimation;
 
 
     public void setSize(int w, int h) {
@@ -56,17 +57,24 @@ public class WorldRenderer {
     }
 
     private void loadTextures() {
-        //bobTexture = new Texture(Gdx.files.internal("images/hobbit.png"));
-        //blockTexture = new Texture(Gdx.files.internal("images/ground2.png"));
+        bobTexture = new Texture(Gdx.files.internal("images/hobbit/Hobbit - Idle1.png"));
+        blockTexture = new Texture(Gdx.files.internal("images/hobbit/ground2.png"));
 
-        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("images/textures3/textures.atlas"));
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("images/textures2/textures.atlas"));
+
         bobIdle = atlas.findRegion("Hobbit - Idle1");
-        System.out.println(bobIdle);
-        TextureRegion[] bobIdleFrames = new TextureRegion[4];
-        for (int i = 1; i < 4; i++) {
-            bobIdleFrames[i] = atlas.findRegion("Hobbit - Idle" + (i + 2));
+        TextureRegion[] bobIdleFrames = new TextureRegion[3];
+        for (int i = 0; i < 3; i++) {
+            bobIdleFrames[i] = atlas.findRegion("Hobbit - Idle" + (i + 1));
         }
         bobIdleAnimation = new Animation(RUNNING_FRAME_DURATION, bobIdleFrames);
+
+        bobIdle = atlas.findRegion("Hobbit - run1");
+        TextureRegion[] bobRunFrames = new TextureRegion[8];
+        for (int i = 0; i < 8; i++) {
+            bobRunFrames[i] = atlas.findRegion("Hobbit - run" + (i + 1));
+        }
+        bobRunAnimation = new Animation(RUNNING_FRAME_DURATION, bobRunFrames);
 
     }
 
@@ -83,9 +91,10 @@ public class WorldRenderer {
     private void drawBob() {
         Bob bob = world.getBob();
 
-        spriteBatch.draw(bobIdle, bob.getPosition().x * ppuX, bob.getPosition().y * ppuY, Bob.SIZE * ppuX, Bob.SIZE * ppuY);
+        bobIdle = (TextureRegion) bobRunAnimation.getKeyFrame(bob.getStateTime(), true);
+        spriteBatch.draw(bobIdle, bob.getPosition().x * ppuX, bob.getPosition().y * ppuY, Bob.SIZE * ppuX, Bob.SIZE * ppuY, Bob.SIZE * ppuX, Bob.SIZE * ppuY, 5f,5f, 0);
 
-        //spriteBatch.draw(bobTexture, bob.getPosition().x * ppuX, bob.getPosition().y * ppuY, Bob.SIZE * ppuX, Bob.SIZE * ppuY);
+       // spriteBatch.draw(bobTexture, bob.getPosition().x * ppuX, bob.getPosition().y * ppuY, Bob.SIZE * ppuX, Bob.SIZE * ppuY);
     }
 
     private void drawBlocks() {
