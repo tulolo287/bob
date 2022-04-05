@@ -34,6 +34,10 @@ public class Bob {
         position.add(velocity.scl(dt));
     }
 
+    public float getStateTime() {
+        return stateTime;
+    }
+
     public static float getSPEED() {
         return SPEED;
     }
