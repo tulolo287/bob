@@ -18,7 +18,7 @@ public class Bob {
     Vector2 velocity = new Vector2();
     Rectangle bounds = new Rectangle();
     State state = State.IDLE;
-    boolean facingLeft = true;
+    public boolean facingLeft = false;
 
     public Bob(Vector2 position) {
         this.position = position;
@@ -72,5 +72,9 @@ public class Bob {
 
     public boolean isFacingLeft() {
         return facingLeft;
+    }
+
+    public void setFacingLeft(Boolean b) {
+        facingLeft = b;
     }
 }
