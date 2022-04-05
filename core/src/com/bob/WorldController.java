@@ -65,12 +65,12 @@ public class WorldController {
 
     private void processInput() {
         if (keys.get(Keys.LEFT)) {
-           // bob.setFacingLeft(true);
+            bob.setFacingLeft(true);
             bob.setState(Bob.State.WALK);
             bob.getVelocity().x = -Bob.SPEED;
         }
         if (keys.get(Keys.RIGHT)) {
-           // bob.setFacingLeft(false);
+            bob.setFacingLeft(false);
             bob.setState(Bob.State.WALK);
             bob.getVelocity().x = Bob.SPEED;
         }
