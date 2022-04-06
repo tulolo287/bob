@@ -9,13 +9,15 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class WorldRenderer {
     private World world;
     private OrthographicCamera cam;
+    private FitViewport viewport;
 
-    private static float CAMERA_WIDTH = 8f;
-    private static float CAMERA_HEIGHT = 6f;
+    private static float CAMERA_WIDTH = 10f;
+    private static float CAMERA_HEIGHT = 8f;
 
     ShapeRenderer debugRenderer = new ShapeRenderer();
 
@@ -39,6 +41,8 @@ public class WorldRenderer {
     public Animation<TextureRegion> bobIdleLeftAnimation;
     public Animation<TextureRegion> bobWalkRightAnimation;
     public Animation<TextureRegion> bobWalkLeftAnimation;
+    public Animation<TextureRegion> bobFireRightAnimation;
+    public Animation<TextureRegion> bobFireLeftAnimation;
 
 
     public void setSize(int w, int h) {
@@ -50,9 +54,13 @@ public class WorldRenderer {
 
     public WorldRenderer(World world, Boolean debug) {
         this.world = world;
+
         this.cam = new OrthographicCamera(CAMERA_WIDTH, CAMERA_HEIGHT);
-        this.cam.position.set(CAMERA_WIDTH / 2f, CAMERA_HEIGHT / 2f, 0);
-        this.cam.update();
+
+        this.cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        this.viewport = new FitViewport(1280, 720);
+        //this.cam.position.set(CAMERA_WIDTH / 2f, CAMERA_HEIGHT / 2f, 0);
+        //this.cam.update();
         this.debug = debug;
         spriteBatch = new SpriteBatch();
         loadTextures();
@@ -70,7 +78,7 @@ public class WorldRenderer {
         for (int i = 0; i < 3; i++) {
             bobIdleRight[i] = atlas.findRegion("Hobbit - Idle" + (i + 1));
         }
-        bobIdleRightAnimation = new Animation(0.25f, bobIdleRight, null);
+        bobIdleRightAnimation = new Animation<TextureRegion>(0.27f, bobIdleRight);
 
 
         TextureRegion[] bobIdleLeft = new TextureRegion[3];
@@ -78,25 +86,42 @@ public class WorldRenderer {
             bobIdleLeft[i] = new TextureRegion(bobIdleRight[i]);
             bobIdleLeft[i].flip(true, false);
         }
-        bobIdleLeftAnimation = new Animation(0.25f, bobIdleLeft, null);
+        bobIdleLeftAnimation = new Animation<TextureRegion>(0.27f, bobIdleLeft);
 
         //bobRun = atlas.findRegion("Hobbit - run1");
         TextureRegion[] bobWalkRight = new TextureRegion[8];
         for (int i = 0; i < 8; i++) {
             bobWalkRight[i] = atlas.findRegion("Hobbit - run" + (i + 1));
         }
-        bobWalkRightAnimation = new Animation(0.1f, bobWalkRight, null);
+        bobWalkRightAnimation = new Animation<TextureRegion>(0.07f, bobWalkRight);
 
         TextureRegion[] bobWalkLeft = new TextureRegion[8];
         for (int i = 0; i < 8; i++) {
-            bobWalkLeft[i] = new TextureRegion(bobWalkLeft[i]);
+            bobWalkLeft[i] = new TextureRegion(bobWalkRight[i]);
             bobWalkLeft[i].flip(true, false);
         }
-        bobWalkLeftAnimation = new Animation(0.1f, bobWalkLeft, null);
+        bobWalkLeftAnimation = new Animation<TextureRegion>(0.07f, bobWalkLeft);
+
+        TextureRegion[] bobFireRight = new TextureRegion[17];
+        for (int i = 0; i < 17; i++) {
+            bobFireRight[i] = atlas.findRegion("Hobbit - attack" + (i + 1));
+        }
+        bobFireRightAnimation = new Animation<TextureRegion>(0.07f, bobFireRight);
+
+        TextureRegion[] bobFireLeft = new TextureRegion[17];
+        for (int i = 0; i < 17; i++) {
+            bobFireLeft[i] = new TextureRegion(bobFireRight[i]);
+            bobFireLeft[i].flip(true, false);
+        }
+        bobFireLeftAnimation = new Animation<TextureRegion>(0.07f, bobFireLeft);
+
+
 
     }
 
     public void render() {
+
+        spriteBatch.setProjectionMatrix(cam.combined);
         spriteBatch.begin();
         drawBlocks();
         drawBob();
@@ -109,14 +134,24 @@ public class WorldRenderer {
     private void drawBob() {
 
         Bob bob = world.getBob();
-        //System.out.println(bob.isFacingLeft());
+        cam.position.x = bob.position.x * ppuX;
+        cam.update();
+        System.out.println(bob.getState());
         //bobFrame = bob.isFacingLeft() ? bobWalkLeft : bobWalkRight;
         switch (bob.getState()) {
             case IDLE:
-                bobFrame = bob.isFacingLeft() ? (TextureRegion) bobIdleLeftAnimation.getKeyFrame(bob.getStateTime(), true) : (TextureRegion) bobIdleRightAnimation.getKeyFrame(bob.getStateTime(), true);
+                if (!bob.fired) {
+                    bobFrame = bob.isFacingLeft() ? bobIdleLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobIdleRightAnimation.getKeyFrame(bob.getStateTime(), true);
+                }
                 break;
             case WALK:
-                bobFrame = bob.isFacingLeft() ? (TextureRegion) bobWalkLeftAnimation.getKeyFrame(bob.getStateTime(), true) : (TextureRegion) bobWalkRightAnimation.getKeyFrame(bob.getStateTime(), true);
+                bobFrame = bob.isFacingLeft() ? bobWalkLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobWalkRightAnimation.getKeyFrame(bob.getStateTime(), true);
+                break;
+            case FIRE:
+                bobFrame = bob.isFacingLeft() ? bobFireLeftAnimation.getKeyFrame(bob.getStateTime(), false) : bobFireRightAnimation.getKeyFrame(bob.getStateTime(), false);
+                if (bobFireRightAnimation.isAnimationFinished(1f) || bobFireLeftAnimation.isAnimationFinished(1f)) {
+                    bob.fired = false;
+                }
                 break;
         }
 
