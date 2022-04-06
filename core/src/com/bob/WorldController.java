@@ -74,7 +74,16 @@ public class WorldController {
             bob.setState(Bob.State.WALK);
             bob.getVelocity().x = Bob.SPEED;
         }
-        if (keys.get(Keys.LEFT) && keys.get(Keys.RIGHT) || !keys.get(Keys.LEFT) && !keys.get(Keys.RIGHT)) {
+        if (keys.get(Keys.JUMP)) {
+            bob.setState(Bob.State.JUMP);
+            bob.getVelocity().y = Bob.JUMP_VELOCITY;
+        }
+        if (keys.get(Keys.FIRE)) {
+            bob.setState(Bob.State.FIRE);
+            bob.fired = true;
+            //bob.getVelocity().y = Bob.JUMP_VELOCITY;
+        }
+        if (keys.get(Keys.LEFT) && keys.get(Keys.RIGHT) || !keys.get(Keys.LEFT) && !keys.get(Keys.RIGHT) && !bob.fired) {
             bob.setState(Bob.State.IDLE);
             bob.getAcceleration().x = 0;
             bob.getVelocity().x = 0;

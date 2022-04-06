@@ -5,9 +5,9 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Bob {
     public static enum State {
-        IDLE, JUMP, WALK, DYE
+        IDLE, JUMP, WALK, FIRE
     }
-    static final float SPEED = 4f;
+    static final float SPEED = 3f;
     static final float JUMP_VELOCITY = 1f;
     static final float SIZE = 0.5f;
 
@@ -19,6 +19,8 @@ public class Bob {
     Rectangle bounds = new Rectangle();
     State state = State.IDLE;
     public boolean facingLeft = false;
+
+    public boolean fired = false;
 
     public Bob(Vector2 position) {
         this.position = position;
