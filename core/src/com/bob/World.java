@@ -66,17 +66,17 @@ public class World {
     private void createWorld() {
         bob = new Bob(new Vector2(1, 1));
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             blocks.add(new Block(new Vector2(i, 0)));
             blocks.add(new Block(new Vector2(i, 7)));
             //if (i > 2) blocks.add(new Block(new Vector2(i, 1)));
         }
-        blocks.add(new Block(new Vector2(9, 2)));
-        blocks.add(new Block(new Vector2(9, 3)));
-        blocks.add(new Block(new Vector2(9, 4)));
+        blocks.add(new Block(new Vector2(9, 1)));
+        blocks.add(new Block(new Vector2(11, 3)));
+        blocks.add(new Block(new Vector2(14, 4)));
         blocks.add(new Block(new Vector2(9, 5)));
+        blocks.add(new Block(new Vector2(5, 3)));
         blocks.add(new Block(new Vector2(6, 3)));
-        blocks.add(new Block(new Vector2(6, 4)));
-        blocks.add(new Block(new Vector2(6, 5)));
+        blocks.add(new Block(new Vector2(7, 3)));
     }
 }

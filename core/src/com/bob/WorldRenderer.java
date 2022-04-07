@@ -1,6 +1,7 @@
 package com.bob;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -141,10 +142,24 @@ public class WorldRenderer {
         spriteBatch.begin();
         drawBlocks();
         drawBob();
+        drawCollisionBlocks();
         spriteBatch.end();
         if (debug) {
             drawDebug();
         }
+    }
+
+    private void drawCollisionBlocks() {
+        debugRenderer.setProjectionMatrix(cam.combined);
+        debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        debugRenderer.setColor(Color.CORAL);
+        debugRenderer.circle(5, 1, 23);
+        for (Rectangle rect : world.getCollisionRects()) {
+            debugRenderer.setColor(Color.CORAL);
+           // debugRenderer.circle(rect.x, rect.y, 23, 23);
+            //debugRenderer.rect(rect.x, rect.y, rect.width, rect.height);
+        }
+        debugRenderer.end();
     }
 
     private void drawBob() {
