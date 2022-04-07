@@ -20,6 +20,8 @@ public class BobController {
     private static final float DUMP = 10.90f;
     private static final float MAX_VELOCITY = 1118f;
 
+    private boolean grounded = false;
+
     private static final float WIDTH = 10f;
 
     private World world;
@@ -34,7 +36,7 @@ public class BobController {
         protected Rectangle newObject() {
             return new Rectangle();
         }
-    }
+    };
 
     static Map<Keys, Boolean> keys = new HashMap<BobController.Keys, Boolean>();
     static {
@@ -85,6 +87,10 @@ public class BobController {
 
     public void update(float dt) {
         processInput();
+
+        if (grounded && bob.getState().equals(Bob.State.JUMP)) {
+            bob.setState(Bob.State.IDLE);
+        }
 
         bob.getAcceleration().y = GRAVITY;
         bob.getAcceleration().scl(dt);
@@ -139,14 +145,24 @@ public class BobController {
         populateCollidableBlocks(startX, startY, endX, endY);
         bobRect.x += bob.getVelocity().x;
         world.getCollisionRects().clear();
-        for (Block block : collidable)
+        for (Block block : collidable) {
+            if (block == null) continue;
+            if (bobRect.overlaps(block.getBounds())) {
+                if (bob.getVelocity().y < 0) {
+                    grounded = true;
+                }
+                bob.getVelocity().y = 0;
+                world.getCollisionRects().add(block.getBounds());
+                break;
+            }
+        }
     }
 
     private void populateCollidableBlocks(int startX, int startY, int endX, int endY) {
         collidable.clear();
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
-                //if (x > 0 && x < world.getBlocks())
+                    collidable.add(world.getBlock()[x][y]);
             }
         }
     }
