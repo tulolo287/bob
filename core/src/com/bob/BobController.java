@@ -1,5 +1,9 @@
 package com.bob;
 
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pool;
+
 import java.util.Map;
 
 import java.util.HashMap;
@@ -22,6 +26,15 @@ public class BobController {
     private Bob bob;
     private long jumpPressedTime;
     public boolean jumpingPressed;
+
+    private Array<Block> collidable = new Array<Block>();
+
+    private Pool<Rectangle> rectPool = new Pool<Rectangle>() {
+        @Override
+        protected Rectangle newObject() {
+            return new Rectangle();
+        }
+    }
 
     static Map<Keys, Boolean> keys = new HashMap<BobController.Keys, Boolean>();
     static {
@@ -107,6 +120,33 @@ public class BobController {
             bob.setPosition(bob.getPosition());
             if (!bob.getState().equals(Bob.State.JUMP)) {
                 bob.setState(Bob.State.IDLE);
+            }
+        }
+    }
+
+    private void checkCollisionWithBlocks(float dt) {
+        bob.getVelocity().scl(dt);
+        Rectangle bobRect = rectPool.obtain();
+        bobRect.set(bob.getBounds().x, bob.getBounds().y, bob.getBounds().width, bob.getBounds().height);
+        int startX, endX;
+        int startY = (int) bob.getBounds().y;
+        int endY = (int) (bob.getBounds().y + bob.getBounds().height);
+        if (bob.getVelocity().x < 0) {
+            startX = endX = (int) Math.floor(bob.getBounds().x + bob.getVelocity().x);
+        } else {
+            startX = endX = (int) Math.floor(bob.getBounds().x + bob.getBounds().width + bob.getVelocity().x);
+        }
+        populateCollidableBlocks(startX, startY, endX, endY);
+        bobRect.x += bob.getVelocity().x;
+        world.getCollisionRects().clear();
+        for (Block block : collidable)
+    }
+
+    private void populateCollidableBlocks(int startX, int startY, int endX, int endY) {
+        collidable.clear();
+        for (int x = startX; x <= endX; x++) {
+            for (int y = startY; y <= endY; y++) {
+                //if (x > 0 && x < world.getBlocks())
             }
         }
     }
