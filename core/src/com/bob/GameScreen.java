@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.GL20;
 public class GameScreen implements Screen, InputProcessor {
     World world;
     WorldRenderer renderer;
-    WorldController controller;
+    BobController controller;
 
     private int width, height;
 
@@ -17,7 +17,7 @@ public class GameScreen implements Screen, InputProcessor {
     public void show() {
         world = new World();
         renderer = new WorldRenderer(world, false);
-        controller = new WorldController(world);
+        controller = new BobController(world);
         Gdx.input.setInputProcessor(this);
     }
 
@@ -70,6 +70,9 @@ public class GameScreen implements Screen, InputProcessor {
         }
         if (keycode == Input.Keys.SPACE) {
             controller.firePressed();
+        }
+        if (keycode == Input.Keys.D) {
+            renderer.setDebug();
         }
         return true;
     }

@@ -52,6 +52,10 @@ public class Bob {
         return position;
     }
 
+    public void setPosition(Vector2 position) {
+        this.position = position;
+    }
+
     public Vector2 getAcceleration() {
         return acceleration;
     }
@@ -74,5 +78,9 @@ public class Bob {
 
     public void setFacingLeft(Boolean b) {
         facingLeft = b;
+    }
+
+    public float getStateTime() {
+        return stateTime;
     }
 }

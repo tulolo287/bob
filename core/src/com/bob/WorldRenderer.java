@@ -43,7 +43,12 @@ public class WorldRenderer {
     public Animation<TextureRegion> bobWalkLeftAnimation;
     public Animation<TextureRegion> bobFireRightAnimation;
     public Animation<TextureRegion> bobFireLeftAnimation;
+    public Animation<TextureRegion> bobJumpRightAnimation;
+    public Animation<TextureRegion> bobJumpLeftAnimation;
 
+    public void setDebug() {
+        this.debug = !debug;
+    }
 
     public void setSize(int w, int h) {
         this.width = w;
@@ -86,35 +91,46 @@ public class WorldRenderer {
             bobIdleLeft[i] = new TextureRegion(bobIdleRight[i]);
             bobIdleLeft[i].flip(true, false);
         }
-        bobIdleLeftAnimation = new Animation<TextureRegion>(0.27f, bobIdleLeft);
+        bobIdleLeftAnimation = new Animation<>(0.27f, bobIdleLeft);
 
-        //bobRun = atlas.findRegion("Hobbit - run1");
         TextureRegion[] bobWalkRight = new TextureRegion[8];
         for (int i = 0; i < 8; i++) {
             bobWalkRight[i] = atlas.findRegion("Hobbit - run" + (i + 1));
         }
-        bobWalkRightAnimation = new Animation<TextureRegion>(0.07f, bobWalkRight);
+        bobWalkRightAnimation = new Animation<>(0.07f, bobWalkRight);
 
         TextureRegion[] bobWalkLeft = new TextureRegion[8];
         for (int i = 0; i < 8; i++) {
             bobWalkLeft[i] = new TextureRegion(bobWalkRight[i]);
             bobWalkLeft[i].flip(true, false);
         }
-        bobWalkLeftAnimation = new Animation<TextureRegion>(0.07f, bobWalkLeft);
+        bobWalkLeftAnimation = new Animation<>(0.07f, bobWalkLeft);
 
         TextureRegion[] bobFireRight = new TextureRegion[17];
         for (int i = 0; i < 17; i++) {
             bobFireRight[i] = atlas.findRegion("Hobbit - attack" + (i + 1));
         }
-        bobFireRightAnimation = new Animation<TextureRegion>(0.07f, bobFireRight);
+        bobFireRightAnimation = new Animation<>(0.07f, bobFireRight);
 
         TextureRegion[] bobFireLeft = new TextureRegion[17];
         for (int i = 0; i < 17; i++) {
             bobFireLeft[i] = new TextureRegion(bobFireRight[i]);
             bobFireLeft[i].flip(true, false);
         }
-        bobFireLeftAnimation = new Animation<TextureRegion>(0.07f, bobFireLeft);
+        bobFireLeftAnimation = new Animation<>(0.07f, bobFireLeft);
 
+        TextureRegion[] bobJumpRight = new TextureRegion[10];
+        for (int i = 0; i < 10; i++) {
+            bobJumpRight[i] = atlas.findRegion("Hobbit - jumpt" + (i + 1));
+        }
+        bobJumpRightAnimation = new Animation<>(0.07f, bobJumpRight);
+
+        TextureRegion[] bobJumpLeft = new TextureRegion[10];
+        for (int i = 0; i < 10; i++) {
+            bobJumpLeft[i] = new TextureRegion(bobJumpRight[i]);
+            bobJumpLeft[i].flip(true, false);
+        }
+        bobJumpLeftAnimation = new Animation<>(0.07f, bobJumpLeft);
 
 
     }
@@ -134,10 +150,12 @@ public class WorldRenderer {
     private void drawBob() {
 
         Bob bob = world.getBob();
+        BobController bobController = new BobController(world);
         cam.position.x = bob.position.x * ppuX;
         cam.update();
+
         System.out.println(bob.getState());
-        //bobFrame = bob.isFacingLeft() ? bobWalkLeft : bobWalkRight;
+
         switch (bob.getState()) {
             case IDLE:
                 if (!bob.fired) {
@@ -146,6 +164,11 @@ public class WorldRenderer {
                 break;
             case WALK:
                 bobFrame = bob.isFacingLeft() ? bobWalkLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobWalkRightAnimation.getKeyFrame(bob.getStateTime(), true);
+                break;
+            case JUMP:
+                if (bob.getVelocity().y == 0) {
+                    bobFrame = bob.isFacingLeft() ? bobJumpLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobJumpRightAnimation.getKeyFrame(bob.getStateTime(), true);
+                }
                 break;
             case FIRE:
                 bobFrame = bob.isFacingLeft() ? bobFireLeftAnimation.getKeyFrame(bob.getStateTime(), false) : bobFireRightAnimation.getKeyFrame(bob.getStateTime(), false);
@@ -171,18 +194,18 @@ public class WorldRenderer {
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
         for (Block block : world.getBlocks()) {
             Rectangle rect = block.getBounds();
-            float x1 = block.getPosition().x;
-            float y1 = block.getPosition().y;
+            float x1 = block.getPosition().x * ppuX;
+            float y1 = block.getPosition().y * ppuY;
             debugRenderer.setColor(1, 0, 0, 1);
-            debugRenderer.rect(x1, y1, rect.width, rect.height);
+            debugRenderer.rect(x1, y1, rect.width * ppuX, rect.height * ppuY);
         }
 
         Bob bob = world.getBob();
         Rectangle rect = bob.getBounds();
-        float x1 = bob.getPosition().x + rect.x;
-        float y1 = bob.getPosition().y + rect.y;
+        float x1 = bob.getPosition().x * ppuX;
+        float y1 = bob.getPosition().y * ppuY;
         debugRenderer.setColor(0, 1, 0, 1);
-        debugRenderer.rect(x1, y1, rect.width, rect.height);
+        debugRenderer.rect(x1, y1, rect.width * ppuX, rect.height * ppuY);
 
         debugRenderer.end();
     }
