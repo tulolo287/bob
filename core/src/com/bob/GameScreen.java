@@ -15,10 +15,10 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(this);
         world = new World();
-        controller = new BobController(world);
         renderer = new WorldRenderer(world, false);
+        controller = new BobController(world);
+        Gdx.input.setInputProcessor(this);
     }
 
     @Override
@@ -26,7 +26,6 @@ public class GameScreen implements Screen, InputProcessor {
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        //controller.checkCollisionWithBlocks(delta);
         controller.update(delta);
         renderer.render();
     }

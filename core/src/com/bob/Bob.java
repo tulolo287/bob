@@ -5,23 +5,35 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Bob {
     public static enum State {
-        IDLE, JUMP, WALK, DYE
+        IDLE, JUMP, WALK, FIRE
     }
-    static final float SPEED = 2f;
+    static final float SPEED = 3f;
     static final float JUMP_VELOCITY = 1f;
     static final float SIZE = 0.5f;
+
+    public float stateTime = 0;
 
     Vector2 position = new Vector2();
     Vector2 acceleration = new Vector2();
     Vector2 velocity = new Vector2();
     Rectangle bounds = new Rectangle();
     State state = State.IDLE;
-    boolean facingLeft = true;
+    public boolean facingLeft = false;
+
+    public boolean fired = false;
 
     public Bob(Vector2 position) {
         this.position = position;
         this.bounds.height = SIZE;
         this.bounds.width = SIZE;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+    public void update(float dt) {
+        stateTime += dt;
+        position.add(velocity.scl(dt));
     }
 
     public static float getSPEED() {
@@ -38,6 +50,10 @@ public class Bob {
 
     public Vector2 getPosition() {
         return position;
+    }
+
+    public void setPosition(Vector2 position) {
+        this.position = position;
     }
 
     public Vector2 getAcceleration() {
@@ -58,5 +74,13 @@ public class Bob {
 
     public boolean isFacingLeft() {
         return facingLeft;
+    }
+
+    public void setFacingLeft(Boolean b) {
+        facingLeft = b;
+    }
+
+    public float getStateTime() {
+        return stateTime;
     }
 }
