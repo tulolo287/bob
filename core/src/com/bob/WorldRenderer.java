@@ -139,25 +139,31 @@ public class WorldRenderer {
     public void render() {
 
         spriteBatch.setProjectionMatrix(cam.combined);
+
         spriteBatch.begin();
-        drawBlocks();
         drawBob();
-        drawCollisionBlocks();
+        drawBlocks();
         spriteBatch.end();
+
+        drawCollisionBlocks();
+
         if (debug) {
-            drawDebug();
+        //    drawDebug();
         }
+
     }
 
     private void drawCollisionBlocks() {
         debugRenderer.setProjectionMatrix(cam.combined);
         debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
         debugRenderer.setColor(Color.CORAL);
-        debugRenderer.circle(5, 1, 23);
+        //debugRenderer.circle(5, 1, 23);
+        //debugRenderer.rect(1, 1, 10, 10);
+        //System.out.println(world.getCollisionRects());
         for (Rectangle rect : world.getCollisionRects()) {
-            debugRenderer.setColor(Color.CORAL);
-           // debugRenderer.circle(rect.x, rect.y, 23, 23);
-            //debugRenderer.rect(rect.x, rect.y, rect.width, rect.height);
+            //debugRenderer.setColor(Color.CORAL);
+            //debugRenderer.circle(1, 1, 223, 3);
+            debugRenderer.rect(rect.x, rect.y, rect.width, rect.height);
         }
         debugRenderer.end();
     }
@@ -165,11 +171,11 @@ public class WorldRenderer {
     private void drawBob() {
 
         Bob bob = world.getBob();
-        BobController bobController = new BobController(world);
+
         cam.position.x = bob.position.x * ppuX;
         cam.update();
 
-        System.out.println(bob.getState());
+        //System.out.println(bob.getState());
 
         switch (bob.getState()) {
             case IDLE:
@@ -199,15 +205,18 @@ public class WorldRenderer {
     }
 
     private void drawBlocks() {
-        for (Block block : world.getBlocks()) {
+        for (Block block : world.getDrawableBlocks((int) CAMERA_WIDTH, (int) CAMERA_HEIGHT)) {
             spriteBatch.draw(blockTexture, block.getPosition().x * ppuX, block.getPosition().y * ppuY, Block.SIZE * ppuX, Block.SIZE * ppuY);
         }
+       /* for (Block block : world.getBlocks()) {
+            spriteBatch.draw(blockTexture, block.getPosition().x * ppuX, block.getPosition().y * ppuY, Block.SIZE * ppuX, Block.SIZE * ppuY);
+        }*/
     }
 
-    private void drawDebug() {
+    /*private void drawDebug() {
         debugRenderer.setProjectionMatrix(cam.combined);
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for (Block block : world.getBlocks()) {
+        for (Block[] block : world.getBlocks()) {
             Rectangle rect = block.getBounds();
             float x1 = block.getPosition().x * ppuX;
             float y1 = block.getPosition().y * ppuY;
@@ -223,7 +232,7 @@ public class WorldRenderer {
         debugRenderer.rect(x1, y1, rect.width * ppuX, rect.height * ppuY);
 
         debugRenderer.end();
-    }
+    }*/
 
 
 }

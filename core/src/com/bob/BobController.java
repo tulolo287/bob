@@ -67,7 +67,6 @@ public class BobController {
         keys.get(keys.put(Keys.FIRE, true));
     }
 
-
     public void leftReleased() {
         keys.get(keys.put(Keys.LEFT, false));
     }
@@ -88,6 +87,7 @@ public class BobController {
     public void update(float dt) {
         processInput();
 
+
         if (grounded && bob.getState().equals(Bob.State.JUMP)) {
             bob.setState(Bob.State.IDLE);
         }
@@ -96,6 +96,7 @@ public class BobController {
         bob.getAcceleration().scl(dt);
         bob.getVelocity().add(bob.getAcceleration().x, bob.getAcceleration().y);
         if (bob.getAcceleration().x == 0) bob.getVelocity().x *= DUMP;
+        checkCollisionWithBlocks(dt);
         if (bob.getAcceleration().x > MAX_VELOCITY) {
             bob.getAcceleration().x = MAX_VELOCITY;
         }
@@ -137,14 +138,40 @@ public class BobController {
         int startX, endX;
         int startY = (int) bob.getBounds().y;
         int endY = (int) (bob.getBounds().y + bob.getBounds().height);
+
         if (bob.getVelocity().x < 0) {
             startX = endX = (int) Math.floor(bob.getBounds().x + bob.getVelocity().x);
         } else {
             startX = endX = (int) Math.floor(bob.getBounds().x + bob.getBounds().width + bob.getVelocity().x);
         }
+
         populateCollidableBlocks(startX, startY, endX, endY);
+
         bobRect.x += bob.getVelocity().x;
+
+        for (Block block : collidable) {
+            if (block == null) continue;
+            if (bobRect.overlaps(block.getBounds())) {
+                bob.getVelocity().x = 0;
+                world.getCollisionRects().add(block.getBounds());
+                break;
+            }
+        }
+
         world.getCollisionRects().clear();
+
+        startX = (int) bob.getBounds().x;
+        endX = (int) (bob.getBounds().x + bob.getBounds().width);
+        if (bob.getVelocity().y < 0) {
+            startY = endY = (int) Math.floor(bob.getBounds().y + bob.getVelocity().y);
+        } else {
+            startY = endY = (int) Math.floor(bob.getBounds().y + bob.getBounds().height + bob.getVelocity().y);
+        }
+
+        populateCollidableBlocks(startX, startY, endX, endY);
+
+        bobRect.y += bob.getVelocity().y;
+
         for (Block block : collidable) {
             if (block == null) continue;
             if (bobRect.overlaps(block.getBounds())) {
@@ -156,13 +183,23 @@ public class BobController {
                 break;
             }
         }
+
+        bobRect.y = bob.getPosition().y;
+
+        // update Bob's position
+        bob.getPosition().add(bob.getVelocity());
+        bob.getBounds().x = bob.getPosition().x;
+        bob.getBounds().y = bob.getPosition().y;
+
+        // un-scale velocity (not in frame time)
+        bob.getVelocity().scl(1 / dt);
     }
 
     private void populateCollidableBlocks(int startX, int startY, int endX, int endY) {
         collidable.clear();
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
-                    collidable.add(world.getBlock()[x][y]);
+                    collidable.add(world.getBlock(x, y));
             }
         }
     }

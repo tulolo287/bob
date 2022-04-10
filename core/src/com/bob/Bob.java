@@ -24,6 +24,8 @@ public class Bob {
 
     public Bob(Vector2 position) {
         this.position = position;
+        this.bounds.x = position.x;
+        this.bounds.y = position.y;
         this.bounds.height = SIZE;
         this.bounds.width = SIZE;
     }
