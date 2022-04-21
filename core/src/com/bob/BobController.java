@@ -131,10 +131,12 @@ public class BobController {
         }
     }
 
-    private void checkCollisionWithBlocks(float dt) {
+    public void checkCollisionWithBlocks(float dt) {
         bob.getVelocity().scl(dt);
+
         Rectangle bobRect = rectPool.obtain();
         bobRect.set(bob.getBounds().x, bob.getBounds().y, bob.getBounds().width, bob.getBounds().height);
+
         int startX, endX;
         int startY = (int) bob.getBounds().y;
         int endY = (int) (bob.getBounds().y + bob.getBounds().height);
@@ -162,6 +164,7 @@ public class BobController {
 
         startX = (int) bob.getBounds().x;
         endX = (int) (bob.getBounds().x + bob.getBounds().width);
+
         if (bob.getVelocity().y < 0) {
             startY = endY = (int) Math.floor(bob.getBounds().y + bob.getVelocity().y);
         } else {
@@ -192,14 +195,16 @@ public class BobController {
         bob.getBounds().y = bob.getPosition().y;
 
         // un-scale velocity (not in frame time)
-        bob.getVelocity().scl(1 / dt);
+        //bob.getVelocity().scl(1 / dt);
     }
 
     private void populateCollidableBlocks(int startX, int startY, int endX, int endY) {
         collidable.clear();
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
+                if (x >= 0 && x < 10 && y >= 0 && y < 7) {
                     collidable.add(world.getBlock(x, y));
+                }
             }
         }
     }
@@ -212,6 +217,7 @@ public class BobController {
                 jumpPressedTime = System.currentTimeMillis();
                 bob.setState(Bob.State.JUMP);
                 bob.getVelocity().y = MAX_JUMP_SPEED;
+                grounded = false;
             } else {
                 if (jumpingPressed && ((System.currentTimeMillis() - jumpPressedTime) >= LONG_JUMP_PRESS)) {
                     jumpingPressed = false;

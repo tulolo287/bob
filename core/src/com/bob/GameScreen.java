@@ -28,7 +28,7 @@ public class GameScreen implements Screen, InputProcessor {
 
         //controller.checkCollisionWithBlocks(delta);
         controller.update(delta);
-        renderer.render();
+            renderer.render();
     }
 
     @Override

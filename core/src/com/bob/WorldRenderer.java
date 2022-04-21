@@ -18,7 +18,7 @@ public class WorldRenderer {
     private FitViewport viewport;
 
     private static float CAMERA_WIDTH = 10f;
-    private static float CAMERA_HEIGHT = 8f;
+    private static float CAMERA_HEIGHT = 7f;
 
     ShapeRenderer debugRenderer = new ShapeRenderer();
 
@@ -63,10 +63,11 @@ public class WorldRenderer {
 
         this.cam = new OrthographicCamera(CAMERA_WIDTH, CAMERA_HEIGHT);
 
-        this.cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        this.viewport = new FitViewport(1280, 720);
-        //this.cam.position.set(CAMERA_WIDTH / 2f, CAMERA_HEIGHT / 2f, 0);
-        //this.cam.update();
+        //this.cam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        //this.viewport = new FitViewport(1280, 720);
+        this.cam.position.set(CAMERA_WIDTH / 2f, CAMERA_HEIGHT / 2f, 0);
+        //this.cam.position.set(world.getBob().getPosition().x, world.getBob().getPosition().y, 0);
+        this.cam.update();
         this.debug = debug;
         spriteBatch = new SpriteBatch();
         loadTextures();
@@ -141,29 +142,31 @@ public class WorldRenderer {
         spriteBatch.setProjectionMatrix(cam.combined);
 
         spriteBatch.begin();
-        drawBob();
+
         drawBlocks();
+        drawBob();
         spriteBatch.end();
 
         drawCollisionBlocks();
 
         if (debug) {
-        //    drawDebug();
+            drawDebug();
         }
 
     }
 
     private void drawCollisionBlocks() {
         debugRenderer.setProjectionMatrix(cam.combined);
-        debugRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        debugRenderer.begin(ShapeRenderer.ShapeType.Line);
         debugRenderer.setColor(Color.CORAL);
         //debugRenderer.circle(5, 1, 23);
         //debugRenderer.rect(1, 1, 10, 10);
         //System.out.println(world.getCollisionRects());
         for (Rectangle rect : world.getCollisionRects()) {
             //debugRenderer.setColor(Color.CORAL);
-            //debugRenderer.circle(1, 1, 223, 3);
+           // debugRenderer.circle(14, 14, 223, 3);
             debugRenderer.rect(rect.x, rect.y, rect.width, rect.height);
+
         }
         debugRenderer.end();
     }
@@ -172,67 +175,63 @@ public class WorldRenderer {
 
         Bob bob = world.getBob();
 
-        cam.position.x = bob.position.x * ppuX;
+        cam.position.x = bob.position.x;
+        //cam.position.y = bob.position.y;
         cam.update();
 
         //System.out.println(bob.getState());
 
         switch (bob.getState()) {
             case IDLE:
-                if (!bob.fired) {
-                    bobFrame = bob.isFacingLeft() ? bobIdleLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobIdleRightAnimation.getKeyFrame(bob.getStateTime(), true);
-                }
+                bobFrame = bob.isFacingLeft() ? bobIdleLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobIdleRightAnimation.getKeyFrame(bob.getStateTime(), true);
                 break;
             case WALK:
                 bobFrame = bob.isFacingLeft() ? bobWalkLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobWalkRightAnimation.getKeyFrame(bob.getStateTime(), true);
                 break;
             case JUMP:
-                if (bob.getVelocity().y == 0) {
-                    bobFrame = bob.isFacingLeft() ? bobJumpLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobJumpRightAnimation.getKeyFrame(bob.getStateTime(), true);
-                }
+                bobFrame = bob.isFacingLeft() ? bobJumpLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobJumpRightAnimation.getKeyFrame(bob.getStateTime(), true);
                 break;
             case FIRE:
                 bobFrame = bob.isFacingLeft() ? bobFireLeftAnimation.getKeyFrame(bob.getStateTime(), false) : bobFireRightAnimation.getKeyFrame(bob.getStateTime(), false);
-                if (bobFireRightAnimation.isAnimationFinished(1f) || bobFireLeftAnimation.isAnimationFinished(1f)) {
-                    bob.fired = false;
-                }
                 break;
         }
 
-        spriteBatch.draw(bobFrame, bob.getPosition().x * ppuX, bob.getPosition().y * ppuY, bob.bounds.getWidth() / 2 * ppuX, bob.bounds.getHeight() / 2 * ppuY, bob.bounds.width * ppuX, bob.bounds.height * ppuY, 5f,5f, 0);
+        spriteBatch.draw(bobFrame, bob.getPosition().x, bob.getPosition().y, bob.bounds.getWidth() / 2, bob.bounds.getHeight() / 2, Bob.SIZE, Bob.SIZE, 5f,5f, 0);
+        //spriteBatch.draw(bobTexture, bob.getPosition().x, bob.getPosition().y, Bob.SIZE, Bob.SIZE);
 
-       // spriteBatch.draw(bobTexture, bob.getPosition().x * ppuX, bob.getPosition().y * ppuY, Bob.SIZE * ppuX, Bob.SIZE * ppuY);
+         //spriteBatch.draw(bobTexture, bob.getPosition().x * ppuX, bob.getPosition().y * ppuY, Bob.SIZE * ppuX, Bob.SIZE * ppuY);
     }
 
     private void drawBlocks() {
         for (Block block : world.getDrawableBlocks((int) CAMERA_WIDTH, (int) CAMERA_HEIGHT)) {
-            spriteBatch.draw(blockTexture, block.getPosition().x * ppuX, block.getPosition().y * ppuY, Block.SIZE * ppuX, Block.SIZE * ppuY);
+            spriteBatch.draw(blockTexture, block.getPosition().x, block.getPosition().y, Block.SIZE, Block.SIZE);
         }
        /* for (Block block : world.getBlocks()) {
             spriteBatch.draw(blockTexture, block.getPosition().x * ppuX, block.getPosition().y * ppuY, Block.SIZE * ppuX, Block.SIZE * ppuY);
         }*/
     }
 
-    /*private void drawDebug() {
+    private void drawDebug() {
         debugRenderer.setProjectionMatrix(cam.combined);
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for (Block[] block : world.getBlocks()) {
-            Rectangle rect = block.getBounds();
-            float x1 = block.getPosition().x * ppuX;
-            float y1 = block.getPosition().y * ppuY;
+        for (int i = 0; i < world.getBlocks().length; i++) {
+            Block[][] block = world.getBlocks();
+            Rectangle rect = block[i][i].getBounds();
+            float x1 = block[i][i].getPosition().x;
+            float y1 = block[i][i].getPosition().y;
             debugRenderer.setColor(1, 0, 0, 1);
-            debugRenderer.rect(x1, y1, rect.width * ppuX, rect.height * ppuY);
+            debugRenderer.rect(x1, y1, rect.width, rect.height);
         }
 
         Bob bob = world.getBob();
         Rectangle rect = bob.getBounds();
-        float x1 = bob.getPosition().x * ppuX;
-        float y1 = bob.getPosition().y * ppuY;
-        debugRenderer.setColor(0, 1, 0, 1);
-        debugRenderer.rect(x1, y1, rect.width * ppuX, rect.height * ppuY);
+        float x1 = bob.getPosition().x;
+        float y1 = bob.getPosition().y;
+        debugRenderer.setColor(0, 0, 1, 1);
+        debugRenderer.rect(x1, y1, rect.width, rect.height);
 
         debugRenderer.end();
-    }*/
+    }
 
 
 }

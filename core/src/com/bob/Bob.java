@@ -35,7 +35,7 @@ public class Bob {
     }
     public void update(float dt) {
         stateTime += dt;
-        position.add(velocity.scl(dt));
+        //position.add(velocity.scl(dt));
     }
 
     public static float getSPEED() {

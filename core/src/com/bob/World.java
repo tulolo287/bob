@@ -24,8 +24,8 @@ public class World {
 
 
     public ArrayList<Block> getDrawableBlocks(int width, int height) {
-        int x = (int) bob.getPosition().x - width;
-        int y = (int) bob.getPosition().y - height;
+        int x = (int)bob.getPosition().x - width;
+        int y = (int)bob.getPosition().y - height;
         if (x < 0) {
             x = 0;
         }
@@ -34,11 +34,16 @@ public class World {
         }
         int x2 = x + 2 * width;
         int y2 = y + 2 * height;
-        //.if (x2 > )
+        if (x2 > 10 ) {
+            x2 = 9;
+        }
+        if (y2 > 7) {
+            y2 = 6;
+        }
         ArrayList<Block> blocks = new ArrayList<Block>();
         Block block;
-        for (int col = x; col <= 10; col++) {
-            for (int row = y; row <= 10; row++) {
+        for (int col = x; col <= x2; col++) {
+            for (int row = y; row <= y2; row++) {
                 block = getBlocks()[col][row];
                 if (block != null) {
                     blocks.add(block);
@@ -65,15 +70,21 @@ public class World {
     }
 
     private void createWorld() {
-        bob = new Bob(new Vector2(1, 1));
-        blocks = new Block[21][17];
 
-        for (int x = 0; x < 21; x++) {
-            for (int y = 0; y < 17; y++) {
+        bob = new Bob(new Vector2(7, 1));
+        blocks = new Block[10][7];
+
+        for (int col = 0; col < 10; col++) {
+            for (int row = 0; row < 7; row++) {
                 //blocks[x][y] = new Block(new Vector2(x, 1));
-                blocks[x][y] = new Block(new Vector2(x, 0));
+                blocks[col][row] = null;
             }
             //if (i > 2) blocks.add(new Block(new Vector2(i, 1)));
+        }
+
+        for (int col = 0; col < 10; col++) {
+            blocks[col][0] = new Block(new Vector2(col, 0));
+            blocks[col][6] = new Block(new Vector2(col, 6));
         }
         blocks[9][1] = new Block(new Vector2(9, 1));
         /*blocks.add(new Block(new Vector2(11, 3)));
