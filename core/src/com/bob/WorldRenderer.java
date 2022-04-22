@@ -46,6 +46,15 @@ public class WorldRenderer {
     public Animation<TextureRegion> bobFireLeftAnimation;
     public Animation<TextureRegion> bobJumpRightAnimation;
     public Animation<TextureRegion> bobJumpLeftAnimation;
+    public Animation<TextureRegion> bobFallRightAnimation;
+    public Animation<TextureRegion> bobFallLeftAnimation;
+
+    private float fallAnimationTime = 0;
+    private float jumpAnimationTime = 0;
+    private float fireAnimationTime = 0;
+
+    private boolean fallAnimationEnd = false;
+    private boolean fireAnimationEnd = false;
 
     public void setDebug() {
         this.debug = !debug;
@@ -121,18 +130,32 @@ public class WorldRenderer {
         }
         bobFireLeftAnimation = new Animation<>(0.07f, bobFireLeft);
 
-        TextureRegion[] bobJumpRight = new TextureRegion[10];
-        for (int i = 0; i < 10; i++) {
+        TextureRegion[] bobJumpRight = new TextureRegion[3];
+        for (int i = 0; i < 3; i++) {
             bobJumpRight[i] = atlas.findRegion("Hobbit - jumpt" + (i + 1));
         }
-        bobJumpRightAnimation = new Animation<>(0.07f, bobJumpRight);
+        bobJumpRightAnimation = new Animation<>(0.17f, bobJumpRight);
 
-        TextureRegion[] bobJumpLeft = new TextureRegion[10];
-        for (int i = 0; i < 10; i++) {
+        TextureRegion[] bobJumpLeft = new TextureRegion[3];
+        for (int i = 0; i < 3; i++) {
             bobJumpLeft[i] = new TextureRegion(bobJumpRight[i]);
             bobJumpLeft[i].flip(true, false);
         }
-        bobJumpLeftAnimation = new Animation<>(0.07f, bobJumpLeft);
+        bobJumpLeftAnimation = new Animation<>(0.17f, bobJumpLeft);
+
+
+        TextureRegion[] bobFallRight = new TextureRegion[7];
+        for (int i = 0; i < 7; i++) {
+            bobFallRight[i] = atlas.findRegion("Hobbit - jumpt" + (i + 4));
+        }
+        bobFallRightAnimation = new Animation<>(0.27f, bobFallRight);
+
+        TextureRegion[] bobFallLeft = new TextureRegion[7];
+        for (int i = 0; i < 7; i++) {
+            bobFallLeft[i] = new TextureRegion(bobFallRight[i]);
+            bobFallLeft[i].flip(true, false);
+        }
+        bobFallLeftAnimation = new Animation<>(0.27f, bobFallLeft);
 
 
     }
@@ -181,20 +204,57 @@ public class WorldRenderer {
 
         //System.out.println(bob.getState());
 
-        switch (bob.getState()) {
-            case IDLE:
-                bobFrame = bob.isFacingLeft() ? bobIdleLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobIdleRightAnimation.getKeyFrame(bob.getStateTime(), true);
-                break;
-            case WALK:
-                bobFrame = bob.isFacingLeft() ? bobWalkLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobWalkRightAnimation.getKeyFrame(bob.getStateTime(), true);
-                break;
-            case JUMP:
-                bobFrame = bob.isFacingLeft() ? bobJumpLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobJumpRightAnimation.getKeyFrame(bob.getStateTime(), true);
-                break;
-            case FIRE:
-                bobFrame = bob.isFacingLeft() ? bobFireLeftAnimation.getKeyFrame(bob.getStateTime(), false) : bobFireRightAnimation.getKeyFrame(bob.getStateTime(), false);
-                break;
-        }
+
+        if (!(bob.getVelocity().y < 0)) {
+            switch (bob.getState()) {
+                case IDLE:
+
+                    bobFrame = bob.isFacingLeft() ? bobIdleLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobIdleRightAnimation.getKeyFrame(bob.getStateTime(), true);
+                    fallAnimationEnd = false;
+                    //jumpAnimationTime += Gdx.graphics.getDeltaTime();
+                    //System.out.println(bobIdleLeftAnimation.isAnimationFinished(bob.getStateTime()));
+                    break;
+                case WALK:
+                    fallAnimationEnd = false;
+                    bobFrame = bob.isFacingLeft() ? bobWalkLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobWalkRightAnimation.getKeyFrame(bob.getStateTime(), true);
+                    break;
+                case JUMP:
+                    //if (!(bob.getVelocity().y < 0)) {
+                        //jumpAnimationTime += Gdx.graphics.getDeltaTime();
+                        //if (!bobJumpRightAnimation.isAnimationFinished(jumpAnimationTime) || bobJumpRightAnimation.isAnimationFinished(jumpAnimationTime)) {
+                        bobFrame = bob.isFacingLeft() ? bobJumpLeftAnimation.getKeyFrame(bob.getStateTime(), false) : bobJumpRightAnimation.getKeyFrame(bob.getStateTime(), false);
+                        //jumpAnimationTime += Gdx.graphics.getDeltaTime();
+                        //}
+                   // }
+                    break;
+                case FIRE:
+                    if (!fallAnimationEnd) {
+                        bobFrame = bob.isFacingLeft() ? bobFireLeftAnimation.getKeyFrame(fireAnimationTime, false) : bobFireRightAnimation.getKeyFrame(fireAnimationTime, false);
+                        fireAnimationTime += Gdx.graphics.getDeltaTime();
+                        if (bobFireRightAnimation.isAnimationFinished(fireAnimationTime) || bobFallLeftAnimation.isAnimationFinished(fireAnimationTime)) {
+                            fireAnimationEnd = true;
+                            fireAnimationTime = 0;
+                        }
+                    }
+                    break;
+            }
+        } if (bob.getVelocity().y < 0 && fallAnimationEnd == false) {
+
+            bobFrame = bob.isFacingLeft() ? bobFallLeftAnimation.getKeyFrame(fallAnimationTime, false) : bobFallRightAnimation.getKeyFrame(fallAnimationTime, false);
+            fallAnimationTime += Gdx.graphics.getDeltaTime();
+            //fallAnimationEnd = true;
+            if (bobFallLeftAnimation.isAnimationFinished(fallAnimationTime)) {
+                fallAnimationEnd = true;
+                fallAnimationTime = 0;
+            }
+
+        } /*else if (bob.getVelocity().y >= 0){
+            bobFrame = bob.isFacingLeft() ? bobIdleLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobIdleRightAnimation.getKeyFrame(bob.getStateTime(), true);
+            fallAnimationEnd = false;
+        }*/
+        System.out.println(1 / Gdx.graphics.getDeltaTime());
+
+
 
         spriteBatch.draw(bobFrame, bob.getPosition().x, bob.getPosition().y, bob.bounds.getWidth() / 2, bob.bounds.getHeight() / 2, Bob.SIZE, Bob.SIZE, 5f,5f, 0);
         //spriteBatch.draw(bobTexture, bob.getPosition().x, bob.getPosition().y, Bob.SIZE, Bob.SIZE);
@@ -214,13 +274,15 @@ public class WorldRenderer {
     private void drawDebug() {
         debugRenderer.setProjectionMatrix(cam.combined);
         debugRenderer.begin(ShapeRenderer.ShapeType.Line);
-        for (int i = 0; i < world.getBlocks().length; i++) {
-            Block[][] block = world.getBlocks();
-            Rectangle rect = block[i][i].getBounds();
-            float x1 = block[i][i].getPosition().x;
-            float y1 = block[i][i].getPosition().y;
-            debugRenderer.setColor(1, 0, 0, 1);
-            debugRenderer.rect(x1, y1, rect.width, rect.height);
+        for (int w = 0; w < 10; w++) {
+            for (int h = 0; h < 7; h++) {
+                Block[][] block = world.getBlocks();
+                Rectangle rect = block[w][h].getBounds();
+                float x1 = block[w][h].getPosition().x;
+                float y1 = block[w][h].getPosition().y;
+                debugRenderer.setColor(1, 0, 0, 1);
+                debugRenderer.rect(x1, y1, rect.width, rect.height);
+            }
         }
 
         Bob bob = world.getBob();

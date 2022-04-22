@@ -102,6 +102,9 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        if (screenX < width / 2 && screenY < height / 2) {
+            controller.firePressed();
+        }
         if (screenX < width / 2 && screenY > height / 2) {
             controller.leftPressed();
         }
@@ -113,6 +116,9 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        if (screenX < width / 2 && screenY < height / 2) {
+            controller.fireReleased();
+        }
         if (screenX < width / 2 && screenY > height / 2) {
             controller.leftReleased();
         }
@@ -124,6 +130,13 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+        if (screenX > 800 && screenY < height / 2 && !controller.jumpingPressed) {
+            controller.jumpPressed();
+            controller.jumpingPressed = true;
+        } else {
+            controller.jumpReleased();
+            controller.jumpingPressed = false;
+        }
         return false;
     }
 

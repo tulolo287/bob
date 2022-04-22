@@ -14,15 +14,15 @@ public class BobController {
     }
 
     private static final long LONG_JUMP_PRESS = 150L;
-    private static final float GRAVITY = -20f;
+    private static final float GRAVITY = -150f;
     private static final float ACCELERATION = 250f;
-    private static final float MAX_JUMP_SPEED = 7f;
+    private static final float MAX_JUMP_SPEED = 10f;
     private static final float DUMP = 10.90f;
     private static final float MAX_VELOCITY = 1118f;
 
-    private boolean grounded = false;
+    public boolean grounded = false;
 
-    private static final float WIDTH = 10f;
+    private static final float WIDTH = 20f;
 
     private World world;
     private Bob bob;
@@ -202,7 +202,7 @@ public class BobController {
         collidable.clear();
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
-                if (x >= 0 && x < 10 && y >= 0 && y < 7) {
+                if (x >= 0 && x < 20 && y >= 0 && y < 7) {
                     collidable.add(world.getBlock(x, y));
                 }
             }
@@ -212,6 +212,8 @@ public class BobController {
     private void processInput() {
 
         if (keys.get(Keys.JUMP)) {
+            //bob.setState(Bob.State.JUMP);
+            //bob.getVelocity().y = MAX_JUMP_SPEED;
             if (!bob.getState().equals(Bob.State.JUMP)) {
                 jumpingPressed = true;
                 jumpPressedTime = System.currentTimeMillis();
@@ -221,7 +223,8 @@ public class BobController {
             } else {
                 if (jumpingPressed && ((System.currentTimeMillis() - jumpPressedTime) >= LONG_JUMP_PRESS)) {
                     jumpingPressed = false;
-                    //bob.setState(Bob.State.IDLE);
+                    //grounded = true;
+                   // bob.setState(Bob.State.IDLE);
                 } else {
                     if (jumpingPressed) {
                         bob.getVelocity().y = MAX_JUMP_SPEED;
