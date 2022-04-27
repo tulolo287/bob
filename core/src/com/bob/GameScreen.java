@@ -105,26 +105,35 @@ public class GameScreen implements Screen, InputProcessor {
         if (screenX < width / 2 && screenY < height / 2) {
             controller.firePressed();
         }
-        if (screenX < width / 2 && screenY > height / 2) {
+        if (screenX > 0 && screenX < 300 && screenY > height - 170 && screenY < height) {
             controller.leftPressed();
         }
-        if (screenX > width / 2 && screenY > height / 2) {
+        if (screenX > 400 && screenX < 700 && screenY > height - 170 && screenY < height) {
             controller.rightPressed();
         }
+        /*if (screenX > width / 2 && screenY > height / 2) {
+            controller.rightPressed();
+        }*/
         return true;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        if (screenX > 0 && screenX < 300 && screenY > height - 170 && screenY < height) {
+            controller.leftReleased();
+        }
+        if (screenX > 400 && screenX < 700 && screenY > height - 170 && screenY < height) {
+            controller.rightReleased();
+        }
         if (screenX < width / 2 && screenY < height / 2) {
             controller.fireReleased();
         }
-        if (screenX < width / 2 && screenY > height / 2) {
+        /*if (screenX < width / 2 && screenY > height / 2) {
             controller.leftReleased();
         }
         if (screenX > width / 2 && screenY > height / 2) {
             controller.rightReleased();
-        }
+        }*/
         return true;
     }
 

@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class WorldRenderer {
@@ -24,6 +25,9 @@ public class WorldRenderer {
 
     private Texture blockTexture;
     private Texture bobTexture;
+
+    private Texture treesBg;
+    private Texture cloudsBg;
 
     private SpriteBatch spriteBatch;
     private boolean debug = false;
@@ -85,6 +89,8 @@ public class WorldRenderer {
     private void loadTextures() {
         bobTexture = new Texture(Gdx.files.internal("images/hobbit/Hobbit - Idle1.png"));
         blockTexture = new Texture(Gdx.files.internal("images/hobbit/ground2.png"));
+        treesBg = new Texture(Gdx.files.internal("images/bg1.png"));
+        cloudsBg = new Texture(Gdx.files.internal("images/bg2.png"));
 
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("images/textures2/textures.atlas"));
 
@@ -165,17 +171,56 @@ public class WorldRenderer {
         spriteBatch.setProjectionMatrix(cam.combined);
 
         spriteBatch.begin();
-
+        drawParallaxBg();
         drawBlocks();
         drawBob();
+        //drawUI();
+
         spriteBatch.end();
 
-        drawCollisionBlocks();
+       // drawCollisionBlocks();
 
         if (debug) {
             drawDebug();
         }
 
+    }
+
+    private void drawParallaxBg() {
+
+        int xOffset = (int) (cam.position.x * 0.1f);
+        treesBg.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+
+        TextureRegion region = new TextureRegion(treesBg);
+
+        region.setRegionX(xOffset % treesBg.getWidth());
+        region.setRegionWidth((int) (cam.viewportWidth));
+        region.setRegionY(xOffset % treesBg.getHeight());
+        region.setRegionHeight((int) (cam.viewportHeight));
+
+        spriteBatch.draw(region, cam.position.x - cam.viewportWidth/2, cam.position.y - cam.viewportHeight/2);
+        //spriteBatch.draw(treesBg, 0, 0 , cam.viewportWidth, cam.viewportHeight);
+        spriteBatch.draw(cloudsBg, 0, 0 , cam.viewportWidth, cam.viewportHeight);
+
+
+    }
+
+    private void drawUI() {
+        spriteBatch.end();
+
+        Rectangle buttonLeft = new Rectangle(0, 0, 100, 50);
+        ShapeRenderer shapeRenderer = new ShapeRenderer();
+        //shapeRenderer.setProjectionMatrix(spriteBatch.getProjectionMatrix());
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(new Color(0, 0, 1, 1.5f));
+        //shapeRenderer.rect(buttonLeft);
+        shapeRenderer.rect(0, 0, 300, 170);
+        shapeRenderer.rect(400, 0, 300, 170);
+        shapeRenderer.end();
+        spriteBatch.begin();
+       /* if (Gdx.input.isTouched()) {
+            Rectangle touch = new Rectangle()
+        }*/
     }
 
     private void drawCollisionBlocks() {
