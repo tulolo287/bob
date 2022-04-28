@@ -25,6 +25,7 @@ public class WorldRenderer {
 
     private Texture blockTexture;
     private Texture bobTexture;
+    private Texture grassTexture;
 
     private float xFactor;
     private float yFactor;
@@ -93,6 +94,7 @@ public class WorldRenderer {
     private void loadTextures() {
         bobTexture = new Texture(Gdx.files.internal("images/hobbit/Hobbit - Idle1.png"));
         blockTexture = new Texture(Gdx.files.internal("images/hobbit/ground2.png"));
+        grassTexture = new Texture(Gdx.files.internal("images/hobbit/grass.png"));
         treesBg = new Texture(Gdx.files.internal("images/bg1.png"));
         cloudsBg = new Texture(Gdx.files.internal("images/bg2.png"));
 
@@ -176,8 +178,9 @@ public class WorldRenderer {
 
         spriteBatch.begin();
         drawParallaxBg();
-        drawBlocks();
         drawBob();
+        drawBlocks();
+
         drawUI();
 
         spriteBatch.end();
@@ -342,6 +345,8 @@ public class WorldRenderer {
     private void drawBlocks() {
         for (Block block : world.getDrawableBlocks((int) CAMERA_WIDTH, (int) CAMERA_HEIGHT)) {
             spriteBatch.draw(blockTexture, block.getPosition().x, block.getPosition().y, Block.SIZE, Block.SIZE);
+            spriteBatch.draw(grassTexture, block.getPosition().x, block.getPosition().y + Block.SIZE * 0.9f, Block.SIZE, Block.SIZE * 0.3f);
+
         }
        /* for (Block block : world.getBlocks()) {
             spriteBatch.draw(blockTexture, block.getPosition().x * ppuX, block.getPosition().y * ppuY, Block.SIZE * ppuX, Block.SIZE * ppuY);
