@@ -202,7 +202,7 @@ public class BobController {
         collidable.clear();
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
-                if (x >= 0 && x < 20 && y >= 0 && y < 7) {
+                if (x >= 0 && x < 40 && y >= 0 && y < 7) {
                     collidable.add(world.getBlock(x, y));
                 }
             }

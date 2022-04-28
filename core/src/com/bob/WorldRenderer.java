@@ -26,6 +26,10 @@ public class WorldRenderer {
     private Texture blockTexture;
     private Texture bobTexture;
 
+    private float xFactor;
+    private float yFactor;
+    private float xSpeed = 0;
+
     private Texture treesBg;
     private Texture cloudsBg;
 
@@ -174,7 +178,7 @@ public class WorldRenderer {
         drawParallaxBg();
         drawBlocks();
         drawBob();
-        //drawUI();
+        drawUI();
 
         spriteBatch.end();
 
@@ -188,19 +192,46 @@ public class WorldRenderer {
 
     private void drawParallaxBg() {
 
-        int xOffset = (int) (cam.position.x * 0.1f);
-        treesBg.setWrap(Texture.TextureWrap.ClampToEdge, Texture.TextureWrap.ClampToEdge);
+        Array<Texture> textures = new Array<>();
+        textures.add(cloudsBg);
+        textures.add(treesBg);
 
-        TextureRegion region = new TextureRegion(treesBg);
+        int xOffset = 0;
+        xSpeed += 0.5f;
+        for (Texture texture : textures) {
+            if (texture == treesBg) {
+                xFactor = 50f;
+                yFactor = -10f;
+                //xSpeed = 0;
+                xOffset = (int) (cam.position.x * xFactor);
+            } else if (texture == cloudsBg){
+                //xSpeed = 1;
 
-        region.setRegionX(xOffset % treesBg.getWidth());
-        region.setRegionWidth((int) (cam.viewportWidth));
-        region.setRegionY(xOffset % treesBg.getHeight());
-        region.setRegionHeight((int) (cam.viewportHeight));
+                xFactor = 5f;
+                yFactor = -2f;
+                xOffset = (int) (cam.position.x * xFactor + xSpeed);
+            }
 
-        spriteBatch.draw(region, cam.position.x - cam.viewportWidth/2, cam.position.y - cam.viewportHeight/2);
-        //spriteBatch.draw(treesBg, 0, 0 , cam.viewportWidth, cam.viewportHeight);
-        spriteBatch.draw(cloudsBg, 0, 0 , cam.viewportWidth, cam.viewportHeight);
+            //int xOffset = (int) (cam.position.x * xFactor + xSpeed);
+            int yOffset = (int) (cam.position.y * yFactor);
+
+            texture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.ClampToEdge);
+
+            TextureRegion region = new TextureRegion(texture);
+
+            region.setRegionX(xOffset % texture.getWidth());
+            region.setRegionY(yOffset % texture.getHeight());
+
+            region.setRegionWidth((int) (texture.getWidth()));
+            region.setRegionHeight((int) (texture.getHeight()));
+
+            spriteBatch.setProjectionMatrix(cam.combined);
+            //spriteBatch.draw(region, cam.position.x - cam.viewportWidth/2, cam.position.y - cam.viewportHeight/2);
+            spriteBatch.draw(region, cam.position.x - cam.viewportWidth/2, cam.position.y - cam.viewportHeight/2 , cam.viewportWidth, cam.viewportHeight);
+           // spriteBatch.draw(cloudsBg, 0, 0 , cam.viewportWidth, cam.viewportHeight);
+
+        }
+
 
 
     }
@@ -244,6 +275,7 @@ public class WorldRenderer {
         Bob bob = world.getBob();
 
         cam.position.x = bob.position.x;
+        cam.position.y = bob.position.y + 2.5f;
         //cam.position.y = bob.position.y;
         cam.update();
 

@@ -34,8 +34,8 @@ public class World {
         }
         int x2 = x + 2 * width;
         int y2 = y + 2 * height;
-        if (x2 > 19 ) {
-            x2 = 18;
+        if (x2 > 39 ) {
+            x2 = 38;
         }
         if (y2 > 7) {
             y2 = 6;
@@ -72,9 +72,9 @@ public class World {
     private void createWorld() {
 
         bob = new Bob(new Vector2(7, 1));
-        blocks = new Block[20][7];
+        blocks = new Block[40][7];
 
-        for (int col = 0; col < 20; col++) {
+        for (int col = 0; col < 40; col++) {
             for (int row = 0; row < 7; row++) {
                 //blocks[x][y] = new Block(new Vector2(x, 1));
                 blocks[col][row] = null;
@@ -82,9 +82,9 @@ public class World {
             //if (i > 2) blocks.add(new Block(new Vector2(i, 1)));
         }
 
-        for (int col = 0; col < 20; col++) {
+        for (int col = 0; col < 40; col++) {
             blocks[col][0] = new Block(new Vector2(col, 0));
-            blocks[col][6] = new Block(new Vector2(col, 6));
+            //blocks[col][6] = new Block(new Vector2(col, 6));
 
         }
         blocks[9][1] = new Block(new Vector2(9, 1));
