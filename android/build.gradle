@@ -90,4 +90,9 @@ task run(type: Exec) {
     commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.bob/com.bob.AndroidLauncher'
 }
 
+dependencies {
+    implementation files('C:\\Users\\ahudokorm\\Downloads\\tween-engine-api-6.3.3\\tween-engine-api-sources.jar')
+    implementation files('C:\\Users\\ahudokorm\\Downloads\\tween-engine-api-6.3.3\\tween-engine-api.jar')
+}
+
 eclipse.project.name = appName + "-android"

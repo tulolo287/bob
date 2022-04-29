@@ -5,13 +5,21 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+
+import aurelienribon.tweenengine.BaseTween;
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenCallback;
+import aurelienribon.tweenengine.TweenManager;
+import aurelienribon.tweenengine.equations.Sine;
 
 public class WorldRenderer {
     private World world;
@@ -26,6 +34,10 @@ public class WorldRenderer {
     private Texture blockTexture;
     private Texture bobTexture;
     private Texture grassTexture;
+
+    private Sprite grassSprite;
+
+    private Sprite test;
 
     private float xFactor;
     private float yFactor;
@@ -65,6 +77,8 @@ public class WorldRenderer {
     private boolean fallAnimationEnd = false;
     private boolean fireAnimationEnd = false;
 
+    private TweenManager tweenManager;
+
     public void setDebug() {
         this.debug = !debug;
     }
@@ -88,6 +102,8 @@ public class WorldRenderer {
         this.cam.update();
         this.debug = debug;
         spriteBatch = new SpriteBatch();
+        test = new Sprite();
+        tweenManager = new TweenManager();
         loadTextures();
     }
 
@@ -95,8 +111,16 @@ public class WorldRenderer {
         bobTexture = new Texture(Gdx.files.internal("images/hobbit/Hobbit - Idle1.png"));
         blockTexture = new Texture(Gdx.files.internal("images/hobbit/ground2.png"));
         grassTexture = new Texture(Gdx.files.internal("images/hobbit/grass.png"));
+
+
         treesBg = new Texture(Gdx.files.internal("images/bg1.png"));
         cloudsBg = new Texture(Gdx.files.internal("images/bg2.png"));
+
+        grassSprite = new Sprite(grassTexture);
+
+        Tween.registerAccessor(Sprite.class, new SpriteAccessor());
+        Tween.call(windCallback).start(tweenManager);
+
 
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("images/textures2/textures.atlas"));
 
@@ -172,14 +196,31 @@ public class WorldRenderer {
 
     }
 
+    private final TweenCallback windCallback = new TweenCallback() {
+        @Override
+        public void onEvent(int i, BaseTween<?> baseTween) {
+            float d = MathUtils.random() * 0.5f + 0.5f;
+            float t = -0.5f * grassSprite.getHeight();
+
+            Tween.to(grassSprite, SpriteAccessor.SKEW_X2X3, d)
+                    .target(t, t)
+                    .ease(Sine.INOUT)
+                    .repeatYoyo(1, 0)
+                    .setCallback(windCallback)
+                    .start(tweenManager);
+        }
+    };
+
     public void render() {
 
         spriteBatch.setProjectionMatrix(cam.combined);
+        tweenManager.update(Gdx.graphics.getDeltaTime());
 
         spriteBatch.begin();
         drawParallaxBg();
         drawBob();
         drawBlocks();
+
 
         drawUI();
 
@@ -345,7 +386,10 @@ public class WorldRenderer {
     private void drawBlocks() {
         for (Block block : world.getDrawableBlocks((int) CAMERA_WIDTH, (int) CAMERA_HEIGHT)) {
             spriteBatch.draw(blockTexture, block.getPosition().x, block.getPosition().y, Block.SIZE, Block.SIZE);
-            spriteBatch.draw(grassTexture, block.getPosition().x, block.getPosition().y + Block.SIZE * 0.9f, Block.SIZE, Block.SIZE * 0.3f);
+            //spriteBatch.draw(grassSprite, block.getPosition().x, block.getPosition().y + Block.SIZE * 0.9f, Block.SIZE, Block.SIZE * 0.3f);
+            grassSprite.setPosition(block.getPosition().x, block.getPosition().y + Block.SIZE * 0.9f);
+            grassSprite.setSize(Block.SIZE, Block.SIZE * 0.3f);
+            grassSprite.draw(spriteBatch);
 
         }
        /* for (Block block : world.getBlocks()) {
