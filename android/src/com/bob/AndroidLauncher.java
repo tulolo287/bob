@@ -12,6 +12,6 @@ public class AndroidLauncher extends AndroidApplication {
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		config.useCompass = false;
 		//config.useWakelock = true;
-		initialize(new Start(), config);
+		initialize(new App(), config);
 	}
 }

@@ -1,6 +1,8 @@
 package com.bob;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 
@@ -15,19 +17,22 @@ public class BobController {
 
     private static final long LONG_JUMP_PRESS = 150L;
     private static final float GRAVITY = -150f;
-    private static final float ACCELERATION = 250f;
+    private static final float ACCELERATION = 100f;
     private static final float MAX_JUMP_SPEED = 10f;
     private static final float DUMP = 10.90f;
     private static final float MAX_VELOCITY = 1118f;
+    private static final float JUMP_FORCE = 5f;
 
     public boolean grounded = false;
 
     private static final float WIDTH = 20f;
 
-    private World world;
+    private WorldRenderer renderer;
+    private Body bobBody;
     private Bob bob;
     private long jumpPressedTime;
     public boolean jumpingPressed;
+    private WorldContactListener worldContactListener;
 
     private Array<Block> collidable = new Array<Block>();
 
@@ -46,9 +51,10 @@ public class BobController {
         keys.put(Keys.FIRE, false);
     }
 
-    public BobController(World world) {
-        this.world = world;
-        this.bob = world.getBob();
+    public BobController(WorldRenderer renderer) {
+        this.renderer = renderer;
+        this.bob = renderer.getBob();
+        this.bobBody = renderer.getBobBody();
     }
 
     public void leftPressed() {
@@ -88,15 +94,16 @@ public class BobController {
         processInput();
 
 
-        if (grounded && bob.getState().equals(Bob.State.JUMP)) {
+        /*if (WorldContactListener.grounded && bob.getState().equals(Bob.State.JUMP)) {
             bob.setState(Bob.State.IDLE);
-        }
+        }*/
+        bob.update(dt);
 
-        bob.getAcceleration().y = GRAVITY;
+       /* bob.getAcceleration().y = GRAVITY;
         bob.getAcceleration().scl(dt);
         bob.getVelocity().add(bob.getAcceleration().x, bob.getAcceleration().y);
         if (bob.getAcceleration().x == 0) bob.getVelocity().x *= DUMP;
-        checkCollisionWithBlocks(dt);
+        //checkCollisionWithBlocks(dt);
         if (bob.getAcceleration().x > MAX_VELOCITY) {
             bob.getAcceleration().x = MAX_VELOCITY;
         }
@@ -128,9 +135,10 @@ public class BobController {
             if (!bob.getState().equals(Bob.State.JUMP)) {
                 bob.setState(Bob.State.IDLE);
             }
-        }
+        }*/
     }
 
+/*
     public void checkCollisionWithBlocks(float dt) {
         bob.getVelocity().scl(dt);
 
@@ -208,17 +216,20 @@ public class BobController {
             }
         }
     }
+*/
 
     private void processInput() {
 
-        if (keys.get(Keys.JUMP)) {
-            //bob.setState(Bob.State.JUMP);
+        if (keys.get(Keys.JUMP) && WorldContactListener.grounded) {
+            bobBody.applyLinearImpulse(new Vector2(0f, JUMP_FORCE), bobBody.getWorldCenter(), true);
+            bob.setState(Bob.State.JUMP);
             //bob.getVelocity().y = MAX_JUMP_SPEED;
-            if (!bob.getState().equals(Bob.State.JUMP)) {
+          /*  if (!bob.getState().equals(Bob.State.JUMP)) {
                 jumpingPressed = true;
                 jumpPressedTime = System.currentTimeMillis();
                 bob.setState(Bob.State.JUMP);
-                bob.getVelocity().y = MAX_JUMP_SPEED;
+                bobBody.applyForceToCenter(new Vector2(0f, -JUMP_FORCE), true);
+                //bob.getVelocity().y = MAX_JUMP_SPEED;
                 grounded = false;
             } else {
                 if (jumpingPressed && ((System.currentTimeMillis() - jumpPressedTime) >= LONG_JUMP_PRESS)) {
@@ -227,30 +238,36 @@ public class BobController {
                    // bob.setState(Bob.State.IDLE);
                 } else {
                     if (jumpingPressed) {
-                        bob.getVelocity().y = MAX_JUMP_SPEED;
+                        bobBody.applyForceToCenter(new Vector2(0f, 10f), true);
+                        //bobBody.getVelocity().y = MAX_JUMP_SPEED;
                     }
                 }
-            }
+            }*/
         }
         if (keys.get(Keys.LEFT)) {
             bob.setFacingLeft(true);
-            if (!bob.getState().equals(Bob.State.JUMP)) {
+            if (WorldContactListener.grounded) {
                 bob.setState(Bob.State.WALK);
                 //bob.getVelocity().x = -Bob.SPEED;
             }
-            bob.getAcceleration().x = -ACCELERATION;
+            //bob.getAcceleration().x = -ACCELERATION;
+            bobBody.applyLinearImpulse(new Vector2(-ACCELERATION, 0), bobBody.getWorldCenter(), true);
         } else if (keys.get(Keys.RIGHT)) {
             bob.setFacingLeft(false);
-            if (!bob.getState().equals(Bob.State.JUMP)) {
+            if (WorldContactListener.grounded) {
                 bob.setState(Bob.State.WALK);
             }
-            bob.getAcceleration().x = ACCELERATION;
+            //bob.getAcceleration().x = ACCELERATION;
+            bobBody.applyLinearImpulse(new Vector2(ACCELERATION, 0), bobBody.getWorldCenter(), true);
         } else {
-            if (!bob.getState().equals(Bob.State.JUMP)) {
-                bob.setState(Bob.State.IDLE);
-            }
-                bob.getAcceleration().x = 0;
+            bobBody.setLinearVelocity(0, bobBody.getLinearVelocity().y);
         }
+        if (bobBody.getLinearVelocity().x == 0) {
+            bob.setState(Bob.State.IDLE);
+        }
+            //bob.getAcceleration().x = 0;
+            ///bobBody.setV
+
         if (keys.get(Keys.FIRE)) {
             bob.setState(Bob.State.FIRE);
             bob.fired = true;

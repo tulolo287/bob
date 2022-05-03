@@ -1,0 +1,55 @@
+
+bob.png
+size: 512, 64
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+Hobbit - Idle1
+  rotate: false
+  xy: 0, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+Hobbit - Idle2
+  rotate: false
+  xy: 64, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+Hobbit - Idle3
+  rotate: false
+  xy: 128, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+Hobbit - Idle4
+  rotate: false
+  xy: 192, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+grass
+  rotate: false
+  xy: 256, 0
+  size: 16, 3
+  orig: 16, 3
+  offset: 0, 0
+  index: -1
+grass2
+  rotate: false
+  xy: 320, 0
+  size: 8, 3
+  orig: 8, 3
+  offset: 0, 0
+  index: -1
+ground2
+  rotate: false
+  xy: 384, 0
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1

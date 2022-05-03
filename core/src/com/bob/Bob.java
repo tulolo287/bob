@@ -2,6 +2,8 @@ package com.bob;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 
 public class Bob {
     public static enum State {
@@ -9,9 +11,11 @@ public class Bob {
     }
     static final float SPEED = 3f;
     static final float JUMP_VELOCITY = 1f;
-    static final float SIZE = 0.5f;
+    static final float SIZE = 32;
 
     public float stateTime = 0;
+
+    private Box2DDebugRenderer box2DDebugRenderer;
 
     Vector2 position = new Vector2();
     Vector2 acceleration = new Vector2();
@@ -28,7 +32,11 @@ public class Bob {
         this.bounds.y = position.y;
         this.bounds.height = SIZE;
         this.bounds.width = SIZE;
+
+
     }
+
+
 
     public void setState(State state) {
         this.state = state;
