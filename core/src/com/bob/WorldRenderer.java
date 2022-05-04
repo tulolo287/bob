@@ -407,7 +407,7 @@ public class WorldRenderer {
         windBlowing();
         if (Gdx.input.isTouched()) {
             Vector2 touchPos = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-            System.out.println(touchPos);
+            //System.out.println(touchPos);
            // System.out.println(viewport.unproject(touchPos));
 
             if (touchPos.x + 100 < 600 && touchPos.x - 100 > 0 && Gdx.graphics.getHeight() - touchPos.y + 100 < 600 && Gdx.graphics.getHeight() - touchPos.y - 100 > 0) {

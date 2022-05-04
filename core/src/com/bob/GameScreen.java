@@ -136,14 +136,7 @@ public class GameScreen implements Screen, InputProcessor {
             controller.firePressed();
         }
 
-        if (renderer.padPos.x < 250) {
-            controller.leftPressed();
-        } else if (renderer.padPos.x > 350) {
-            controller.rightPressed();
-        } else if (renderer.padPos.x > 280 && renderer.padPos.x < 320) {
-            controller.leftReleased();
-            controller.rightReleased();
-        }
+
 
         /*if (screenX < width / 2 && screenY < height / 2) {
             controller.firePressed();
@@ -169,6 +162,8 @@ public class GameScreen implements Screen, InputProcessor {
         }*/
         controller.leftReleased();
         controller.rightReleased();
+        renderer.padPos.x = 300;
+        renderer.padPos.y = 300;
         /*if (renderer.padPos.x > 300) {
             controller.rightReleased();
         }*/
@@ -193,6 +188,18 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
+
+        if (renderer.padPos.x < 250) {
+            controller.leftPressed();
+        } else if (renderer.padPos.x > 350) {
+            controller.rightPressed();
+        } else if (renderer.padPos.x > 280 && renderer.padPos.x < 320) {
+            controller.leftReleased();
+            controller.rightReleased();
+            renderer.padPos.x = 300;
+            renderer.padPos.y = 300;
+        }
+
         if (screenX > 800 && screenY < height / 2 && !controller.jumpingPressed) {
             controller.jumpPressed();
             controller.jumpingPressed = true;
