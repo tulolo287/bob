@@ -9,9 +9,11 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class App extends Game {
 	SpriteBatch batch;
-	static final float PPM = 100;
-	static final byte PLAYER = 2;
-	static final byte GROUND = 4;
+	static final float PPM = 100f;
+
+	static final short PLAYER = 0x0001;
+	static final short GROUND = 0x0002;
+
 
 	@Override
 	public void create () {

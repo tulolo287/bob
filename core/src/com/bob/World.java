@@ -71,7 +71,7 @@ public class World {
 
     private void createWorld() {
 
-        bob = new Bob(new Vector2(7, 1));
+        bob = new Bob();
         blocks = new Block[40][7];
 
         for (int col = 0; col < 40; col++) {

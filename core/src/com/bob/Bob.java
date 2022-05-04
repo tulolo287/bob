@@ -26,7 +26,7 @@ public class Bob {
 
     public boolean fired = false;
 
-    public Bob(Vector2 position) {
+    public Bob() {
         this.position = position;
         this.bounds.x = position.x;
         this.bounds.y = position.y;

@@ -17,11 +17,11 @@ public class BobController {
 
     private static final long LONG_JUMP_PRESS = 150L;
     private static final float GRAVITY = -150f;
-    private static final float ACCELERATION = 100f;
+    private static final float ACCELERATION = .1f;
     private static final float MAX_JUMP_SPEED = 10f;
     private static final float DUMP = 10.90f;
     private static final float MAX_VELOCITY = 1118f;
-    private static final float JUMP_FORCE = 5f;
+    private static final float JUMP_FORCE = 1f;
 
     public boolean grounded = false;
 

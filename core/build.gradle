@@ -1,7 +1,9 @@
 sourceCompatibility = 1.7
 dependencies {
-    implementation files('/home/arch/tween-engine-api-6.3.3/tween-engine-api.jar')
-    implementation files('/home/arch/tween-engine-api-6.3.3/tween-engine-api-sources.jar')
+    //implementation files('/home/arch/tween-engine-api-6.3.3/tween-engine-api.jar')
+    //implementation files('/home/arch/tween-engine-api-6.3.3/tween-engine-api-sources.jar')
+    implementation files('C:\\Users\\ahudokorm\\Downloads\\tween-engine-api-6.3.3\\tween-engine-api.jar')
+    implementation files('C:\\Users\\ahudokorm\\Downloads\\tween-engine-api-6.3.3\\tween-engine-api-sources.jar')
 }
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 

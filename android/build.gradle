@@ -91,8 +91,10 @@ task run(type: Exec) {
 }
 
 dependencies {
-    implementation files('/home/arch/tween-engine-api-6.3.3/tween-engine-api.jar')
-    implementation files('/home/arch/tween-engine-api-6.3.3/tween-engine-api-sources.jar')
+    //implementation files('/home/arch/tween-engine-api-6.3.3/tween-engine-api.jar')
+    //implementation files('/home/arch/tween-engine-api-6.3.3/tween-engine-api-sources.jar')
+    implementation files('C:\\Users\\ahudokorm\\Downloads\\tween-engine-api-6.3.3\\tween-engine-api.jar')
+    implementation files('C:\\Users\\ahudokorm\\Downloads\\tween-engine-api-6.3.3\\tween-engine-api-sources.jar')
 }
 
 

@@ -131,8 +131,21 @@ public class GameScreen implements Screen, InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         System.out.println(screenX);
         System.out.println(screenY);
-        renderer.shapeRenderer.translate(screenX, screenY, 0f);
+        //renderer.shapeRenderer.translate(screenX, screenY, 0f);
         if (screenX < width / 2 && screenY < height / 2) {
+            controller.firePressed();
+        }
+
+        if (renderer.padPos.x < 250) {
+            controller.leftPressed();
+        } else if (renderer.padPos.x > 350) {
+            controller.rightPressed();
+        } else if (renderer.padPos.x > 280 && renderer.padPos.x < 320) {
+            controller.leftReleased();
+            controller.rightReleased();
+        }
+
+        /*if (screenX < width / 2 && screenY < height / 2) {
             controller.firePressed();
         }
         if (screenX > 0 && screenX < 300 && screenY > height - 170 && screenY < height) {
@@ -140,22 +153,32 @@ public class GameScreen implements Screen, InputProcessor {
         }
         if (screenX > 400 && screenX < 700 && screenY > height - 170 && screenY < height) {
             controller.rightPressed();
-        }
+        }*/
 
         /*if (screenX > width / 2 && screenY > height / 2) {
             controller.rightPressed();
         }*/
-        return true;
+        return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (screenX > 0 && screenX < 300 && screenY > height - 170 && screenY < height) {
+        /*if (renderer.padPos.x > 280 && renderer.padPos.x < 320) {
+            controller.leftReleased();
+            controller.rightReleased();
+        }*/
+        controller.leftReleased();
+        controller.rightReleased();
+        /*if (renderer.padPos.x > 300) {
+            controller.rightReleased();
+        }*/
+
+       /* if (screenX > 0 && screenX < 300 && screenY > height - 170 && screenY < height) {
             controller.leftReleased();
         }
         if (screenX > 400 && screenX < 700 && screenY > height - 170 && screenY < height) {
             controller.rightReleased();
-        }
+        }*/
         if (screenX < width / 2 && screenY < height / 2) {
             controller.fireReleased();
         }

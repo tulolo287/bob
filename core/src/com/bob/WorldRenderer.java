@@ -23,6 +23,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2D;
@@ -41,6 +42,8 @@ import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenManager;
 import aurelienribon.tweenengine.equations.Sine;
 import com.badlogic.gdx.physics.box2d.World;
+
+import org.lwjgl.Sys;
 
 public class WorldRenderer {
     private World world;
@@ -117,6 +120,7 @@ public class WorldRenderer {
 
     private Bob bob;
     private Body bobBody;
+    private Body collisionBody;
 
     private Box2DDebugRenderer box2DDebugRenderer;
 
@@ -134,6 +138,8 @@ public class WorldRenderer {
     private BodyDef bodyDef;
     private float aspectRatio;
     private int worldWidth;
+
+    public Vector2 padPos;
 
     public void setDebug() {
         this.debug = !debug;
@@ -155,7 +161,7 @@ public class WorldRenderer {
         accumulator = 0;
         //this.world = world;
         //bob = world.getBob();
-        bob = new Bob(new Vector2(7, 70));
+        bob = new Bob();
         world = new World(new Vector2(0f, -9.81f), true);
         world.setContactListener(new WorldContactListener());
         box2DDebugRenderer = new Box2DDebugRenderer();
@@ -164,8 +170,8 @@ public class WorldRenderer {
         worldWidth = 300;
 
         cam = new OrthographicCamera();
-        cam.setToOrtho(false, GameScreen.WIDTH, GameScreen.HEIGHT);
-        cam.position.set(cam.viewportWidth / 2,  cam.viewportHeight / 2, 0);
+        cam.setToOrtho(false, GameScreen.WIDTH / App.PPM, GameScreen.HEIGHT / App.PPM);
+        cam.position.set(10,  100, 0);
         cam.update();
 
         viewport = new FitViewport(worldWidth, worldWidth / aspectRatio, cam);
@@ -190,6 +196,7 @@ public class WorldRenderer {
         test = new Sprite();
 
         shapeRenderer = new ShapeRenderer();
+        padPos = new Vector2(300, 300);
 
         loadTextures();
         createWorld();
@@ -201,23 +208,26 @@ public class WorldRenderer {
     private Body createBody() {
         bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(bob.getPosition().x, bob.getPosition().y);
+        bodyDef.position.set(0, 1f);
         bobBody = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(4f, 8f);
+        shape.setAsBox(.04f, .07f);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         Fixture fixture = bobBody.createFixture(fixtureDef);
 
         shape = new PolygonShape();
-        shape.setAsBox(3f, 2f, new Vector2(0, -7f), 0);
+        shape.setAsBox(.02f, .01f, new Vector2(0, -.07f), 0);
 
 
         fixtureDef = new FixtureDef();
-        fixtureDef.isSensor = true;
         fixtureDef.shape = shape;
+
+        fixtureDef.filter.categoryBits = App.PLAYER;
+        fixtureDef.filter.maskBits = App.GROUND;
+        fixtureDef.isSensor = true;
         fixture = bobBody.createFixture(fixtureDef);
         fixture.setUserData("feet");
 
@@ -232,16 +242,21 @@ public class WorldRenderer {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
             bodyDef = new BodyDef();
             bodyDef.type = BodyDef.BodyType.StaticBody;
-            bodyDef.position.set(rectangle.x + rectangle.getWidth() / 2, rectangle.y + rectangle.getHeight() / 2);
-            bobBody = world.createBody(bodyDef);
+            bodyDef.position.set(rectangle.x / App.PPM + rectangle.getWidth() / 2 / App.PPM, rectangle.y / App.PPM + rectangle.getHeight() / 2 / App.PPM);
+            collisionBody = world.createBody(bodyDef);
 
             PolygonShape shape = new PolygonShape();
-            shape.setAsBox(rectangle.getWidth() / 2, rectangle.getHeight() / 2);
+            shape.setAsBox(rectangle.getWidth() / 2 / App.PPM, rectangle.getHeight() / 2 / App.PPM);
 
             FixtureDef fixtureDef = new FixtureDef();
             fixtureDef.shape = shape;
-            Fixture fixture = bobBody.createFixture(fixtureDef);
-            bobBody.setUserData("ground");
+            fixtureDef.filter.categoryBits = App.GROUND;
+            fixtureDef.filter.maskBits = App.PLAYER;
+
+
+            Fixture fixture = collisionBody.createFixture(fixtureDef);
+
+            collisionBody.setUserData("ground");
 
             shape.dispose();
         }
@@ -250,17 +265,18 @@ public class WorldRenderer {
             Rectangle rectangle = ((RectangleMapObject) object).getRectangle();
             bodyDef = new BodyDef();
             bodyDef.type = BodyDef.BodyType.StaticBody;
-            bodyDef.position.set(rectangle.x + rectangle.getWidth() / 2, rectangle.y + rectangle.getHeight() / 2);
-            bobBody = world.createBody(bodyDef);
+            bodyDef.position.set(rectangle.x / App.PPM + rectangle.getWidth() / 2 / App.PPM, rectangle.y / App.PPM + rectangle.getHeight() / 2 / App.PPM);
+            collisionBody = world.createBody(bodyDef);
 
             PolygonShape shape = new PolygonShape();
-            shape.setAsBox(rectangle.getWidth() / 2, rectangle.getHeight() / 2);
+            shape.setAsBox(rectangle.getWidth() / 2 / App.PPM, rectangle.getHeight() / 2 / App.PPM);
 
             FixtureDef fixtureDef = new FixtureDef();
             fixtureDef.shape = shape;
+
             fixtureDef.isSensor = true;
-            Fixture fixture = bobBody.createFixture(fixtureDef);
-            bobBody.setUserData("grass");
+            Fixture fixture = collisionBody.createFixture(fixtureDef);
+            collisionBody.setUserData("grass");
 
             shape.dispose();
         }
@@ -389,8 +405,23 @@ public class WorldRenderer {
     public void render() {
 
         windBlowing();
+        if (Gdx.input.isTouched()) {
+            Vector2 touchPos = new Vector2(Gdx.input.getX(), Gdx.input.getY());
+            System.out.println(touchPos);
+           // System.out.println(viewport.unproject(touchPos));
 
-        spriteBatch.setProjectionMatrix(cam.combined);
+            if (touchPos.x + 100 < 600 && touchPos.x - 100 > 0 && Gdx.graphics.getHeight() - touchPos.y + 100 < 600 && Gdx.graphics.getHeight() - touchPos.y - 100 > 0) {
+                padPos.y = Gdx.graphics.getHeight() - touchPos.y;
+                padPos.x = touchPos.x;
+            }
+
+            //padPos.y = touchPos.y;
+            //shapeRenderer.translate(touchPos.x, touchPos.y, 0);
+
+
+        }
+
+        spriteBatch.setProjectionMatrix(cam.combined.cpy().scl(App.PPM));
         tiledMapRenderer.setView(cam);
 
 
@@ -411,13 +442,13 @@ public class WorldRenderer {
         //drawBlocks();
         //drawGrass();
 
-        //drawGamePlay();
+        drawGamePlay();
         //drawUI();
 
 
         spriteBatch.end();
 
-        box2DDebugRenderer.render(world, cam.combined);
+        //box2DDebugRenderer.render(world, cam.combined.cpy().scl(App.PPM));
 
         //tweenManager.update(Gdx.graphics.getDeltaTime());
        // drawCollisionBlocks();
@@ -452,12 +483,12 @@ public class WorldRenderer {
         spriteBatch.end();
         //shapeRenderer.setProjectionMatrix(cam.combined);
 
-      /*  shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(new Color(0, 0, 1, 0.3f));
-        shapeRenderer.circle(200, 200, 200);
-        shapeRenderer.end();*/
+        shapeRenderer.circle(300, 300, 300);
+        shapeRenderer.end();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.circle(200, 200, 50);
+        shapeRenderer.circle(padPos.x, padPos.y, 100);
         shapeRenderer.end();
         spriteBatch.begin();
     }
@@ -513,7 +544,7 @@ public class WorldRenderer {
 
             //spriteBatch.setProjectionMatrix(cam.combined);
             //spriteBatch.draw(region, cam.position.x - cam.viewportWidth/2, cam.position.y - cam.viewportHeight/2);
-            spriteBatch.draw(region, cam.position.x - cam.viewportWidth / 2, cam.position.y - cam.viewportHeight / 2, 0, 0, cam.viewportWidth, cam.viewportHeight, 1f, 1f, 0);
+            spriteBatch.draw(region, cam.position.x / App.PPM - cam.viewportWidth / 2 / App.PPM, cam.position.y / App.PPM - cam.viewportHeight / 2 / App.PPM, 0, 0, cam.viewportWidth / App.PPM, cam.viewportHeight / App.PPM, 1f, 1f, 0);
            // spriteBatch.draw(cloudsBg, 0, 0 , cam.viewportWidth, cam.viewportHeight);
 
         }
@@ -560,9 +591,10 @@ public class WorldRenderer {
 
 
         cam.position.set(cam.viewportWidth / 2,  cam.viewportHeight / 2, 0);
-     if (bobBody.getPosition().x > cam.viewportWidth / 2){
-            cam.position.x = bobBody.getPosition().x;
-        }
+     //if (bobBody.getPosition().x > cam.viewportWidth / 2){
+        //cam.unproject(cam.position);
+            cam.position.x = bobBody.getPosition().x * App.PPM;
+       // }
 
         //cam.position.y = bob.position.y + 2.5f;
         //cam.position.y = bob.position.y;
@@ -624,7 +656,9 @@ public class WorldRenderer {
 
         //spriteBatch.draw(player, bobBody.getPosition().x - player.getWidth() / 2, bobBody.getPosition().y - player.getHeight() / 2, 0, 0, player.getWidth(), player.getHeight(), 1f,1f, 0);
 
-        spriteBatch.draw(bobFrame, bobBody.getPosition().x - bobTexture.getWidth() / 2, bobBody.getPosition().y - bobTexture.getHeight() / 2, bobTexture.getWidth() / 2, bobTexture.getHeight() / 2, bobTexture.getWidth(), bobTexture.getHeight(), 1f,1f, 0);
+        //spriteBatch.draw(bobFrame, bobBody.getPosition().x - bobTexture.getWidth() / 2, bobBody.getPosition().y - bobTexture.getHeight() / 2, bobTexture.getWidth() / 2, bobTexture.getHeight() / 2, bobTexture.getWidth(), bobTexture.getHeight(), 1f,1f, 0);
+
+        spriteBatch.draw(bobFrame, bobBody.getPosition().x - bobTexture.getWidth() / App.PPM / 2,  bobBody.getPosition().y - bobTexture.getHeight() / App.PPM / 2, 0, 0, bobTexture.getWidth() / App.PPM, bobTexture.getHeight() / App.PPM, 1f,1f, 0);
 
         //spriteBatch.draw(bobFrame, bob.getPosition().x, bob.getPosition().y, bob.bounds.getWidth() / 2, bob.bounds.getHeight() / 2, Bob.SIZE, Bob.SIZE, 1f,1f, 0);
 
