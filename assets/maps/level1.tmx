@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="32" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="27">
+<map version="1.5" tiledversion="2021.03.23" orientation="orthogonal" renderorder="right-down" width="32" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="36">
  <tileset firstgid="1" source="Sprite-0001.tsx"/>
  <tileset firstgid="145" source="SET1_Mainlev_build.tsx"/>
  <tileset firstgid="1165" source="SET1_decorative_obj.tsx"/>
@@ -16,12 +16,16 @@
   </data>
  </layer>
  <objectgroup id="5" name="grassObj">
-  <object id="18" x="32" y="176" width="16" height="16"/>
+  <object id="18" x="33.9091" y="180.091" width="11" height="14.5613"/>
   <object id="26" x="118" y="224" width="20" height="16"/>
+  <object id="29" x="241" y="224.091" width="14.9091" height="16"/>
  </objectgroup>
  <objectgroup id="4" name="collision">
-  <object id="13" x="0" y="192" width="64" height="64"/>
-  <object id="16" x="64" y="240" width="112" height="16"/>
-  <object id="17" x="224" y="240" width="112" height="16"/>
+  <object id="13" x="0" y="194.716" width="67.875" height="61.2841"/>
+  <object id="16" x="64" y="242.909" width="116.943" height="13.0909"/>
+  <object id="17" x="218.92" y="242.909" width="124.705" height="13.0909"/>
+  <object id="28" x="-0.0909091" y="144.091" width="8.81818" height="49.9432"/>
+  <object id="32" x="181.031" y="251.75" width="37.8438" height="4"/>
+  <object id="35" x="343.818" y="192" width="5.45455" height="64.1818"/>
  </objectgroup>
 </map>

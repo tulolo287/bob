@@ -20,7 +20,7 @@ public class BobController {
     private static final float ACCELERATION = .05f;
     private static final float MAX_JUMP_SPEED = 10f;
     private static final float DUMP = 10.90f;
-    private static final float MAX_VELOCITY = 1118f;
+    private static final float MAX_VELOCITY = 1.5f;
     private static final float JUMP_FORCE = 1f;
 
     public boolean grounded = false;
@@ -244,7 +244,7 @@ public class BobController {
                 }
             }*/
         }
-        if (keys.get(Keys.LEFT)) {
+        if (keys.get(Keys.LEFT) && bobBody.getLinearVelocity().x > -MAX_VELOCITY) {
             bob.setFacingLeft(true);
             if (WorldContactListener.grounded) {
                 bob.setState(Bob.State.WALK);
@@ -252,16 +252,16 @@ public class BobController {
             }
             //bob.getAcceleration().x = -ACCELERATION;
             bobBody.applyLinearImpulse(new Vector2(-ACCELERATION, 0), bobBody.getWorldCenter(), true);
-        } else if (keys.get(Keys.RIGHT)) {
+        } else if (keys.get(Keys.RIGHT) && bobBody.getLinearVelocity().x < MAX_VELOCITY) {
             bob.setFacingLeft(false);
             if (WorldContactListener.grounded) {
                 bob.setState(Bob.State.WALK);
             }
             //bob.getAcceleration().x = ACCELERATION;
             bobBody.applyLinearImpulse(new Vector2(ACCELERATION, 0), bobBody.getWorldCenter(), true);
-        } else {
-            bobBody.setLinearVelocity(0, bobBody.getLinearVelocity().y);
-        }
+        } //else if (bobBody.getLinearVelocity().x > 0.1f || bobBody.getLinearVelocity().x < -0.1f) {
+                //bobBody.setLinearVelocity(bobBody.getLinearVelocity().x * 0.02f, bobBody.getLinearVelocity().y);
+       // }
         if (bobBody.getLinearVelocity().x == 0) {
             bob.setState(Bob.State.IDLE);
         }

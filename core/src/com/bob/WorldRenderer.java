@@ -208,7 +208,7 @@ public class WorldRenderer {
     private Body createBody() {
         bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(0, 1f);
+        bodyDef.position.set(0.2f, 1f);
         bobBody = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
@@ -219,7 +219,7 @@ public class WorldRenderer {
         Fixture fixture = bobBody.createFixture(fixtureDef);
 
         shape = new PolygonShape();
-        shape.setAsBox(.02f, .01f, new Vector2(0, -.07f), 0);
+        shape.setAsBox(.03f, .01f, new Vector2(0, -.07f), 0);
 
 
         fixtureDef = new FixtureDef();
@@ -273,6 +273,7 @@ public class WorldRenderer {
 
             FixtureDef fixtureDef = new FixtureDef();
             fixtureDef.shape = shape;
+
 
             fixtureDef.isSensor = true;
             Fixture fixture = collisionBody.createFixture(fixtureDef);
@@ -482,9 +483,10 @@ public class WorldRenderer {
     private void drawGamePlay() {
         spriteBatch.end();
         //shapeRenderer.setProjectionMatrix(cam.combined);
-
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(new Color(0, 0, 1, 0.3f));
+        shapeRenderer.setColor(new Color(1f, 1f, 1f, 0.3f));
         shapeRenderer.circle(300, 300, 300);
         shapeRenderer.end();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);

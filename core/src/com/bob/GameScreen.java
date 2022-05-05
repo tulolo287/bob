@@ -129,8 +129,8 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        System.out.println(screenX);
-        System.out.println(screenY);
+        //System.out.println(screenX);
+        //System.out.println(screenY);
         //renderer.shapeRenderer.translate(screenX, screenY, 0f);
         if (screenX < width / 2 && screenY < height / 2) {
             controller.firePressed();
@@ -162,6 +162,7 @@ public class GameScreen implements Screen, InputProcessor {
         }*/
         controller.leftReleased();
         controller.rightReleased();
+        controller.jumpReleased();
         renderer.padPos.x = 300;
         renderer.padPos.y = 300;
         /*if (renderer.padPos.x > 300) {
@@ -188,25 +189,33 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-
+        System.out.println(renderer.padPos.y);
         if (renderer.padPos.x < 250) {
             controller.leftPressed();
         } else if (renderer.padPos.x > 350) {
             controller.rightPressed();
-        } else if (renderer.padPos.x > 280 && renderer.padPos.x < 320) {
+        } else if (renderer.padPos.x > 250 && renderer.padPos.x < 350) {
             controller.leftReleased();
             controller.rightReleased();
             renderer.padPos.x = 300;
+            //renderer.padPos.y = 300;
+        }
+        //System.out.println(renderer.padPos.y);
+        if (renderer.padPos.y > 350 && renderer.padPos.y < 500) {
+            controller.jumpPressed();
+        } else if (renderer.padPos.y > 0 && renderer.padPos.y < 350) {
+            controller.jumpReleased();
+            //renderer.padPos.x = 300;
             renderer.padPos.y = 300;
         }
 
-        if (screenX > 800 && screenY < height / 2 && !controller.jumpingPressed) {
+       /* if (screenX > 800 && screenY < height / 2 && !controller.jumpingPressed) {
             controller.jumpPressed();
             controller.jumpingPressed = true;
         } else {
             controller.jumpReleased();
             controller.jumpingPressed = false;
-        }
+        }*/
         return false;
     }
 
