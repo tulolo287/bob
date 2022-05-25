@@ -15,6 +15,7 @@ public class App extends Game {
 	static final short GROUND = 0x0002;
 
 
+
 	@Override
 	public void create () {
 		setScreen(new GameScreen());

@@ -31,8 +31,10 @@ public class BobController {
     private Body bobBody;
     private Bob bob;
     private long jumpPressedTime;
-    public boolean jumpingPressed;
+    public static boolean jumpingPressed = false;
     private WorldContactListener worldContactListener;
+
+    public static boolean padTouched = false;
 
     private Array<Block> collidable = new Array<Block>();
 
@@ -67,6 +69,7 @@ public class BobController {
 
     public void jumpPressed() {
         keys.get(keys.put(Keys.JUMP, true));
+        //jumpingPressed = true;
     }
 
     public void firePressed() {
@@ -83,7 +86,7 @@ public class BobController {
 
     public void jumpReleased() {
         keys.get(keys.put(Keys.JUMP, false));
-        jumpingPressed = false;
+        //jumpingPressed = false;
     }
 
     public void fireReleased() {
@@ -219,10 +222,15 @@ public class BobController {
 */
 
     private void processInput() {
-
-        if (keys.get(Keys.JUMP) && WorldContactListener.grounded) {
+System.out.println(jumpingPressed);
+        if (keys.get(Keys.JUMP) && WorldContactListener.grounded && jumpingPressed == false) {
             bobBody.applyLinearImpulse(new Vector2(0f, JUMP_FORCE), bobBody.getWorldCenter(), true);
             bob.setState(Bob.State.JUMP);
+
+           /* if (bobBody.getLinearVelocity().y < 0) {
+                jumpingPressed = true;
+            }*/
+
             //bob.getVelocity().y = MAX_JUMP_SPEED;
           /*  if (!bob.getState().equals(Bob.State.JUMP)) {
                 jumpingPressed = true;

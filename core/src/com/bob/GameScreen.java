@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import jdk.internal.vm.compiler.word.WordFactory;
@@ -132,11 +133,22 @@ public class GameScreen implements Screen, InputProcessor {
         //System.out.println(screenX);
         //System.out.println(screenY);
         //renderer.shapeRenderer.translate(screenX, screenY, 0f);
-        if (screenX < width / 2 && screenY < height / 2) {
+   /*     if (screenX < width / 2 && screenY < height / 2) {
+            controller.firePressed();
+        }*/
+        Circle fireTouchPad = new Circle(2100, 150, 100);
+        if (fireTouchPad.contains(screenX, Gdx.graphics.getHeight() - screenY)) {
             controller.firePressed();
         }
 
 
+
+        Circle fingerCircle = new Circle(screenX, Gdx.graphics.getHeight() - screenY, 30);
+        Circle touchCircle = new Circle(300, 300, 300);
+
+        if (touchCircle.contains(fingerCircle)) {
+            BobController.padTouched = true;
+        }
 
         /*if (screenX < width / 2 && screenY < height / 2) {
             controller.firePressed();
@@ -160,11 +172,18 @@ public class GameScreen implements Screen, InputProcessor {
             controller.leftReleased();
             controller.rightReleased();
         }*/
-        controller.leftReleased();
-        controller.rightReleased();
-        controller.jumpReleased();
-        renderer.padPos.x = 300;
-        renderer.padPos.y = 300;
+        Circle fireTouchPad = new Circle(2100, 150, 100);
+        if (fireTouchPad.contains(screenX, Gdx.graphics.getHeight() - screenY)) {
+            controller.fireReleased();
+        } else {
+            BobController.padTouched = false;
+            controller.leftReleased();
+            controller.rightReleased();
+            controller.jumpReleased();
+            renderer.padPos.x = 300;
+            renderer.padPos.y = 300;
+        }
+
         /*if (renderer.padPos.x > 300) {
             controller.rightReleased();
         }*/
@@ -189,7 +208,7 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        System.out.println(renderer.padPos.y);
+        //System.out.println(renderer.padPos.y);
         if (renderer.padPos.x < 250) {
             controller.leftPressed();
         } else if (renderer.padPos.x > 350) {
@@ -197,16 +216,20 @@ public class GameScreen implements Screen, InputProcessor {
         } else if (renderer.padPos.x > 250 && renderer.padPos.x < 350) {
             controller.leftReleased();
             controller.rightReleased();
-            renderer.padPos.x = 300;
+            renderer.padPos.x = renderer.touchCircleHeight;
             //renderer.padPos.y = 300;
         }
         //System.out.println(renderer.padPos.y);
-        if (renderer.padPos.y > 350 && renderer.padPos.y < 500) {
+        if (renderer.padPos.y > 450 && renderer.padPos.y < 500 ) {
+
             controller.jumpPressed();
-        } else if (renderer.padPos.y > 0 && renderer.padPos.y < 350) {
+            //controller.jumpingPressed = true;
+
+        } else if (renderer.padPos.y > 0 && renderer.padPos.y < 370) {
             controller.jumpReleased();
+            //controller.jumpingPressed = false;
             //renderer.padPos.x = 300;
-            renderer.padPos.y = 300;
+            renderer.padPos.y = renderer.touchCircleHeight;
         }
 
        /* if (screenX > 800 && screenY < height / 2 && !controller.jumpingPressed) {

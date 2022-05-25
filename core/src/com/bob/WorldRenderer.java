@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -47,8 +48,9 @@ import org.lwjgl.Sys;
 
 public class WorldRenderer {
     private World world;
-    private OrthographicCamera cam;
-    private FitViewport viewport;
+    static OrthographicCamera cam;
+    static OrthographicCamera hudCam;
+    static FitViewport viewport;
 
     private static float CAMERA_WIDTH = 10f;
     private static float CAMERA_HEIGHT = 7f;
@@ -140,6 +142,17 @@ public class WorldRenderer {
     private int worldWidth;
 
     public Vector2 padPos;
+    public float padSize;
+
+    private Array<Particle> particles;
+
+    private ParticleEffect effect;
+
+    private ShapeRenderer particleShapeRenderer;
+
+    private int particleCount = 0;
+
+    public float touchCircleHeight;
 
     public void setDebug() {
         this.debug = !debug;
@@ -157,12 +170,26 @@ public class WorldRenderer {
     }
 
     public WorldRenderer(Boolean debug) {
+
+
+        particleShapeRenderer = new ShapeRenderer();
+        TextureAtlas particleAtlas = new TextureAtlas();
+        particleAtlas.getTextures();
+        //effect = new ParticleEffect();
+        //effect.load(Gdx.files.internal("dust.p"), Gdx.files.internal("./"));
+        //effect.setEmittersCleanUpBlendFunction(false);
+
+
+
+
+
+        particles = new Array<>();
         Box2D.init();
         accumulator = 0;
         //this.world = world;
         //bob = world.getBob();
         bob = new Bob();
-        world = new World(new Vector2(0f, -9.81f), true);
+        world = new World(new Vector2(0f, -10f), true);
         world.setContactListener(new WorldContactListener());
         box2DDebugRenderer = new Box2DDebugRenderer();
 
@@ -170,9 +197,11 @@ public class WorldRenderer {
         worldWidth = 300;
 
         cam = new OrthographicCamera();
-        cam.setToOrtho(false, GameScreen.WIDTH / App.PPM, GameScreen.HEIGHT / App.PPM);
+        //cam.setToOrtho();
         cam.position.set(10,  100, 0);
         cam.update();
+
+        hudCam = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
         viewport = new FitViewport(worldWidth, worldWidth / aspectRatio, cam);
         viewport.apply();
@@ -196,19 +225,41 @@ public class WorldRenderer {
         test = new Sprite();
 
         shapeRenderer = new ShapeRenderer();
-        padPos = new Vector2(300, 300);
+        touchCircleHeight = GameScreen.HEIGHT / 5;
+        padSize = touchCircleHeight / 3;
+        padPos = new Vector2(touchCircleHeight, touchCircleHeight);
 
         loadTextures();
         createWorld();
         createBody();
+        //createParticles();
 
+
+    }
+
+
+    public OrthographicCamera getCam() {
+        return cam;
+    }
+
+    private void createParticles() {
+      /*  effect.setPosition(bobBody.getPosition().x * App.PPM, bobBody.getPosition().y * App.PPM);
+        //effect.scaleEffect(0.8f);
+        effect.start();*/
+
+
+
+
+        for (int i = 0; i < 5; i++) {
+            particles.add(new Particle(bobBody.getPosition().x * App.PPM, bobBody.getPosition().y * App.PPM));
+        }
 
     }
 
     private Body createBody() {
         bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(0.2f, 1f);
+        bodyDef.position.set(.2f, 2f);
         bobBody = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
@@ -404,25 +455,35 @@ public class WorldRenderer {
     };
 
     public void render() {
+        spriteBatch.setProjectionMatrix(cam.combined);
+        //particleShapeRenderer.setProjectionMatrix(cam.combined.cpy().scl(App.PPM));
+        particleShapeRenderer.setProjectionMatrix(cam.combined);
 
         windBlowing();
-        if (Gdx.input.isTouched()) {
+        if (Gdx.input.isTouched() && BobController.padTouched) {
             Vector2 touchPos = new Vector2(Gdx.input.getX(), Gdx.input.getY());
             //System.out.println(touchPos);
            // System.out.println(viewport.unproject(touchPos));
 
-            if (touchPos.x + 100 < 600 && touchPos.x - 100 > 0 && Gdx.graphics.getHeight() - touchPos.y + 100 < 600 && Gdx.graphics.getHeight() - touchPos.y - 100 > 0) {
-                padPos.y = Gdx.graphics.getHeight() - touchPos.y;
-                padPos.x = touchPos.x;
-            }
+           // if (touchPos.x + 100 < 600 && touchPos.x - 100 > 0 && Gdx.graphics.getHeight() - touchPos.y + 100 < 600 && Gdx.graphics.getHeight() - touchPos.y - 100 > 0) {
+                padPos.y = Gdx.graphics.getHeight() - touchPos.y > 500 ? 500 : Math.max(Gdx.graphics.getHeight() - touchPos.y, 100);
+                padPos.x = touchPos.x > 500 ? 500 : Math.max(touchPos.x, 100);
+          //  }
 
             //padPos.y = touchPos.y;
             //shapeRenderer.translate(touchPos.x, touchPos.y, 0);
+            //createParticles();
+            //drawParticles();
 
 
         }
+        if (bobBody.getLinearVelocity().y < 0 && padPos.y > 450) {
+            BobController.jumpingPressed = true;
+        } else if (padPos.y < 370) {
+            BobController.jumpingPressed = false;
+        }
 
-        spriteBatch.setProjectionMatrix(cam.combined.cpy().scl(App.PPM));
+
         tiledMapRenderer.setView(cam);
 
 
@@ -433,22 +494,32 @@ public class WorldRenderer {
 
 
         spriteBatch.begin();
+        //effect.draw(spriteBatch, Gdx.graphics.getDeltaTime());
 
         drawParallaxBg();
         spriteBatch.end();
+
         tiledMapRenderer.render();
+
         spriteBatch.begin();
-        drawBob();
+
 
         //drawBlocks();
         //drawGrass();
 
         drawGamePlay();
+        drawBob();
+        drawParticles();
+
+
         //drawUI();
 
-
+//effect.draw(spriteBatch, Gdx.graphics.getDeltaTime());
         spriteBatch.end();
 
+       /* if (effect.isComplete()) {
+           // effect.reset();
+        }*/
         //box2DDebugRenderer.render(world, cam.combined.cpy().scl(App.PPM));
 
         //tweenManager.update(Gdx.graphics.getDeltaTime());
@@ -458,6 +529,19 @@ public class WorldRenderer {
             //drawDebug();
         }
 
+    }
+
+    private void drawParticles() {
+        spriteBatch.end();
+        for (Particle particle : particles) {
+            particle.update();
+            if (particle.time >= 10) {
+                particles.pop();
+            }
+            particle.draw(particleShapeRenderer);
+
+        }
+        spriteBatch.begin();
     }
 
     private void windBlowing() {
@@ -482,15 +566,23 @@ public class WorldRenderer {
 
     private void drawGamePlay() {
         spriteBatch.end();
-        //shapeRenderer.setProjectionMatrix(cam.combined);
+        //shapeRenderer.setProjectionMatrix(cam.projection);
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(new Color(1f, 1f, 1f, 0.3f));
-        shapeRenderer.circle(300, 300, 300);
+        shapeRenderer.circle(touchCircleHeight, touchCircleHeight, touchCircleHeight);
         shapeRenderer.end();
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.circle(padPos.x, padPos.y, 100);
+        shapeRenderer.circle(padPos.x, padPos.y, padSize);
+        shapeRenderer.end();
+        shapeRenderer.setColor(new Color(1f, 0, 0, 0.3f));
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.circle(2100, 150, 100);
+        shapeRenderer.end();
+        shapeRenderer.setColor(new Color(0, 0, 1f, 0.3f));
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.circle(2380, 350, 100);
         shapeRenderer.end();
         spriteBatch.begin();
     }
@@ -591,7 +683,7 @@ public class WorldRenderer {
 
     private void drawBob() {
 
-
+        //shapeRenderer.setProjectionMatrix(cam.projection);
         cam.position.set(cam.viewportWidth / 2,  cam.viewportHeight / 2, 0);
      //if (bobBody.getPosition().x > cam.viewportWidth / 2){
         //cam.unproject(cam.position);
@@ -604,7 +696,7 @@ public class WorldRenderer {
 
 
         //System.out.println(bob.getState());
-
+        particleCount++;
 
         if (!(bobBody.getLinearVelocity().y < 0)) {
             switch (bob.getState()) {
@@ -616,6 +708,14 @@ public class WorldRenderer {
                     //System.out.println(bobIdleLeftAnimation.isAnimationFinished(bob.getStateTime()));
                     break;
                 case WALK:
+
+                    if (bobBody.getLinearVelocity().x > .5f && WorldContactListener.grounded && particleCount >= 10 || bobBody.getLinearVelocity().x < -.5f && WorldContactListener.grounded && particleCount >= 20) {
+
+                        createParticles();
+
+                        particleCount = 0;
+                    }
+
                     fallAnimationEnd = false;
                     bobFrame = bob.isFacingLeft() ? bobWalkLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobWalkRightAnimation.getKeyFrame(bob.getStateTime(), true);
                     //bobBody.applyLinearImpulse(new Vector2(1f, 0f),new Vector2(1f, 0f), true);
@@ -625,6 +725,12 @@ public class WorldRenderer {
                         //jumpAnimationTime += Gdx.graphics.getDeltaTime();
                         //if (!bobJumpRightAnimation.isAnimationFinished(jumpAnimationTime) || bobJumpRightAnimation.isAnimationFinished(jumpAnimationTime)) {
                         bobFrame = bob.isFacingLeft() ? bobJumpLeftAnimation.getKeyFrame(bob.getStateTime(), false) : bobJumpRightAnimation.getKeyFrame(bob.getStateTime(), false);
+
+                    if (WorldContactListener.grounded && particleCount >= 20) {
+                        createParticles();
+                        particleCount = 0;
+                    }
+
                         //jumpAnimationTime += Gdx.graphics.getDeltaTime();
                         //}
                    // }
@@ -650,17 +756,21 @@ public class WorldRenderer {
                 fallAnimationTime = 0;
             }
 
-        } /*else if (bob.getVelocity().y >= 0){
+        }
+
+
+
+        /*else if (bob.getVelocity().y >= 0){
             bobFrame = bob.isFacingLeft() ? bobIdleLeftAnimation.getKeyFrame(bob.getStateTime(), true) : bobIdleRightAnimation.getKeyFrame(bob.getStateTime(), true);
             fallAnimationEnd = false;
         }*/
-       // System.out.println(1 / Gdx.graphics.getDeltaTime());
+        //System.out.println(bob.getState());
 
         //spriteBatch.draw(player, bobBody.getPosition().x - player.getWidth() / 2, bobBody.getPosition().y - player.getHeight() / 2, 0, 0, player.getWidth(), player.getHeight(), 1f,1f, 0);
 
         //spriteBatch.draw(bobFrame, bobBody.getPosition().x - bobTexture.getWidth() / 2, bobBody.getPosition().y - bobTexture.getHeight() / 2, bobTexture.getWidth() / 2, bobTexture.getHeight() / 2, bobTexture.getWidth(), bobTexture.getHeight(), 1f,1f, 0);
 
-        spriteBatch.draw(bobFrame, bobBody.getPosition().x - bobTexture.getWidth() / App.PPM / 2,  bobBody.getPosition().y - bobTexture.getHeight() / App.PPM / 2, 0, 0, bobTexture.getWidth() / App.PPM, bobTexture.getHeight() / App.PPM, 1f,1f, 0);
+        spriteBatch.draw(bobFrame, bobBody.getPosition().x * App.PPM - bobTexture.getWidth() / 2,  bobBody.getPosition().y * App.PPM - bobTexture.getHeight() / 2, 0, 0, bobTexture.getWidth(), bobTexture.getHeight(), 1f,1f, 0);
 
         //spriteBatch.draw(bobFrame, bob.getPosition().x, bob.getPosition().y, bob.bounds.getWidth() / 2, bob.bounds.getHeight() / 2, Bob.SIZE, Bob.SIZE, 1f,1f, 0);
 
